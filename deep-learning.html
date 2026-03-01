@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deep Learning — Deep Blog</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="scroll-progress" id="scrollProgress"></div>
+
+  <nav class="navbar" id="navbar">
+    <a href="index.html" class="nav-brand">⟨deep/blog⟩</a>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="deep-learning.html" class="active">Deep Learning</a></li>
+      <li><a href="brain.html">Brain</a></li>
+      <li><a href="universe.html">Universe</a></li>
+    </ul>
+  </nav>
+
+  <!-- Hero with neural network animation -->
+  <section class="landing-hero">
+    <canvas class="hero-canvas" id="dlHeroCanvas"></canvas>
+    <div class="landing-hero-content">
+      <div class="hero-badge">
+        <span class="dot"></span>
+        Deep Learning
+      </div>
+      <h1>Deep <span class="gradient-text">Learning</span></h1>
+      <p>From the mathematics of neural networks to state-of-the-art generative models. Each article is a comprehensive deep dive with interactive 3D visualizations, code, and rigorous explanations.</p>
+    </div>
+    <div class="hero-overlay"></div>
+  </section>
+
+  <!-- Search + Blog Cards -->
+  <section class="landing-body">
+    <div class="container">
+
+      <div class="search-wrapper">
+        <span class="search-icon">🔍</span>
+        <input type="text" class="search-bar" id="blogSearch" placeholder="Search blogs by title, topic, or tag..." autocomplete="off">
+        <button class="search-clear" id="searchClear" aria-label="Clear search">✕</button>
+      </div>
+
+      <div class="blog-cards-grid" id="blogGrid">
+
+        <!-- Blog Card: Samplers -->
+        <a href="samplers-flow-matching.html" class="blog-card reveal" data-title="Samplers for Flow Matching" data-tags="samplers,ode,euler,rk4,heun,midpoint,adaptive,flow matching,generative models">
+          <div class="blog-card-body">
+            <div class="blog-card-icon">🎯</div>
+            <div class="blog-card-meta">
+              <span>Mar 2026</span>
+              <span>30 min read</span>
+            </div>
+            <h3>Samplers for Flow Matching: From Euler to Adaptive ODE Solvers</h3>
+            <p class="blog-card-summary">A deep dive into ODE solvers for generating samples — Euler, Midpoint, Heun, RK4, adaptive methods, stochastic samplers, and distillation — with interactive side-by-side comparisons.</p>
+            <div class="blog-card-tags">
+              <span class="tag-pill">flow matching</span>
+              <span class="tag-pill purple">ODE solvers</span>
+              <span class="tag-pill green">interactive</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- Blog Card: Flow Matching -->
+        <a href="flow-matching.html" class="blog-card reveal" data-title="Flow Matching: The Complete Guide" data-tags="flow matching,generative models,velocity field,optimal transport,conditional flow matching,cnf,ode,probability paths">
+          <div class="blog-card-body">
+            <div class="blog-card-icon green">📐</div>
+            <div class="blog-card-meta">
+              <span>Mar 2026</span>
+              <span>35 min read</span>
+            </div>
+            <h3>Flow Matching: The Complete Guide</h3>
+            <p class="blog-card-summary">From probability distributions to state-of-the-art generative models — everything you need to understand flow matching, explained visually with interactive 3D animations and PyTorch code.</p>
+            <div class="blog-card-tags">
+              <span class="tag-pill">flow matching</span>
+              <span class="tag-pill purple">optimal transport</span>
+              <span class="tag-pill green">interactive</span>
+              <span class="tag-pill pink">PyTorch</span>
+            </div>
+          </div>
+        </a>
+
+      </div>
+
+      <p class="no-results" id="noResults">No blogs match your search.</p>
+
+    </div>
+  </section>
+
+  <div class="glow-orb cyan" style="width:400px;height:400px;top:5%;right:-8%;"></div>
+  <div class="glow-orb purple" style="width:500px;height:500px;bottom:20%;left:-10%;"></div>
+
+  <footer class="footer">
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="deep-learning.html">Deep Learning</a>
+      <a href="brain.html">Brain</a>
+      <a href="universe.html">Universe</a>
+    </div>
+    <p>&copy; 2026 Deep Blog. Built with curiosity and caffeine.</p>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/deep-learning-hero.js"></script>
+
+  <!-- Search functionality -->
+  <script>
+  (function() {
+    const input = document.getElementById('blogSearch');
+    const clearBtn = document.getElementById('searchClear');
+    const grid = document.getElementById('blogGrid');
+    const noResults = document.getElementById('noResults');
+    if (!input || !grid) return;
+
+    const cards = Array.from(grid.querySelectorAll('.blog-card'));
+
+    input.addEventListener('input', function() {
+      const q = this.value.toLowerCase().trim();
+      clearBtn.classList.toggle('visible', q.length > 0);
+      let visible = 0;
+
+      cards.forEach(card => {
+        const title = (card.dataset.title || '').toLowerCase();
+        const tags = (card.dataset.tags || '').toLowerCase();
+        const summary = (card.querySelector('.blog-card-summary') || {}).textContent || '';
+        const match = !q || title.includes(q) || tags.includes(q) || summary.toLowerCase().includes(q);
+
+        card.classList.toggle('filtered-out', !match);
+        card.classList.toggle('filtered-in', match);
+        if (match) visible++;
+      });
+
+      noResults.classList.toggle('visible', visible === 0 && q.length > 0);
+    });
+
+    clearBtn.addEventListener('click', function() {
+      input.value = '';
+      input.dispatchEvent(new Event('input'));
+      input.focus();
+    });
+  })();
+  </script>
+</body>
+</html>

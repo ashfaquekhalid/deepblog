@@ -21,63 +21,157 @@
     <ul class="nav-links" id="navLinks">
       <li><a href="index.html">Home</a></li>
       <li><a href="about.html">About</a></li>
-      <li class="nav-dropdown">
-        <a href="#">Deep Learning ▾</a>
-        <ul class="dropdown-menu">
-          <li><a href="flow-matching.html">Flow Matching</a></li>
-          <li><a href="samplers-flow-matching.html">Samplers</a></li>
-        </ul>
-      </li>
+      <li><a href="deep-learning.html">Deep Learning</a></li>
       <li><a href="brain.html">Brain</a></li>
       <li><a href="universe.html" class="active">Universe</a></li>
     </ul>
   </nav>
 
-  <section class="coming-soon">
-    <div class="coming-soon-content">
-      <span class="coming-soon-icon">🌌</span>
-      <h1>Know Our<br><span class="gradient-text">Universe</span></h1>
-      <p>From the quantum foam to the cosmic web — a journey through the fundamental nature of reality.</p>
-      <div class="btn-group">
-        <a href="index.html" class="btn btn-secondary">← Back Home</a>
+  <!-- Hero with galaxy animation -->
+  <section class="landing-hero">
+    <canvas class="hero-canvas" id="universeHeroCanvas"></canvas>
+    <div class="landing-hero-content">
+      <div class="hero-badge" style="background: rgba(244,114,182,0.08); border-color: rgba(244,114,182,0.2); color: var(--accent-pink);">
+        <span class="dot" style="background: var(--accent-pink);"></span>
+        Cosmology
       </div>
+      <h1>Know Our<br><span class="gradient-text">Universe</span></h1>
+      <p>From the quantum foam to the cosmic web — a journey through the fundamental nature of reality, spacetime, and our place in the cosmos.</p>
+    </div>
+    <div class="hero-overlay"></div>
+  </section>
 
-      <div style="margin-top: 4rem; max-width: 500px; margin-left: auto; margin-right: auto;">
-        <div class="card" style="text-align: left; margin-bottom: 1rem;">
-          <div class="card-content">
-            <h4 style="color: var(--accent-pink);">Planned Topics</h4>
-            <ul style="color: var(--text-secondary); margin-top: 0.8rem;">
-              <li>Quantum mechanics — the rules of the very small</li>
-              <li>General relativity — the geometry of spacetime</li>
-              <li>The Standard Model of particle physics</li>
-              <li>Cosmology — the Big Bang and cosmic evolution</li>
-              <li>Dark matter and dark energy</li>
-              <li>Black holes, neutron stars, and exotic objects</li>
-              <li>The arrow of time and entropy</li>
-              <li>Multiverse theories and the fine-tuning problem</li>
-              <li>The search for quantum gravity</li>
-            </ul>
+  <!-- Coming Soon Blog Cards -->
+  <section class="landing-body">
+    <div class="container">
+
+      <div class="blog-cards-grid">
+
+        <div class="blog-card coming-soon-card reveal">
+          <div class="blog-card-body">
+            <div class="blog-card-icon pink">⚛️</div>
+            <h3>Quantum Mechanics</h3>
+            <p class="blog-card-summary">The rules of the very small. Wave-particle duality, superposition, entanglement, and the measurement problem — reality is stranger than fiction.</p>
+            <div class="blog-card-tags">
+              <span class="tag-pill pink">quantum</span>
+              <span class="tag-pill">physics</span>
+            </div>
+            <span class="coming-soon-label">Coming Soon</span>
           </div>
         </div>
+
+        <div class="blog-card coming-soon-card reveal">
+          <div class="blog-card-body">
+            <div class="blog-card-icon">🕳️</div>
+            <h3>General Relativity & Spacetime</h3>
+            <p class="blog-card-summary">Einstein's masterpiece. How mass curves spacetime, why time dilates near gravity, and the geometry that governs the cosmos.</p>
+            <div class="blog-card-tags">
+              <span class="tag-pill">relativity</span>
+              <span class="tag-pill pink">spacetime</span>
+            </div>
+            <span class="coming-soon-label">Coming Soon</span>
+          </div>
+        </div>
+
+        <div class="blog-card coming-soon-card reveal">
+          <div class="blog-card-body">
+            <div class="blog-card-icon purple">🌌</div>
+            <h3>The Big Bang & Cosmic Evolution</h3>
+            <p class="blog-card-summary">From an infinitely dense singularity to 2 trillion galaxies in 13.8 billion years. The most epic story ever told.</p>
+            <div class="blog-card-tags">
+              <span class="tag-pill purple">cosmology</span>
+              <span class="tag-pill orange">big bang</span>
+            </div>
+            <span class="coming-soon-label">Coming Soon</span>
+          </div>
+        </div>
+
+        <div class="blog-card coming-soon-card reveal">
+          <div class="blog-card-body">
+            <div class="blog-card-icon green">🔭</div>
+            <h3>Dark Matter & Dark Energy</h3>
+            <p class="blog-card-summary">95% of the universe is invisible. What is dark matter? What drives cosmic acceleration? The biggest mysteries in physics.</p>
+            <div class="blog-card-tags">
+              <span class="tag-pill green">dark matter</span>
+              <span class="tag-pill">mystery</span>
+            </div>
+            <span class="coming-soon-label">Coming Soon</span>
+          </div>
+        </div>
+
+        <div class="blog-card coming-soon-card reveal">
+          <div class="blog-card-body">
+            <div class="blog-card-icon pink">🌀</div>
+            <h3>Black Holes & Exotic Objects</h3>
+            <p class="blog-card-summary">Where spacetime breaks down. Event horizons, Hawking radiation, neutron stars, and the information paradox.</p>
+            <div class="blog-card-tags">
+              <span class="tag-pill pink">black holes</span>
+              <span class="tag-pill purple">extreme physics</span>
+            </div>
+            <span class="coming-soon-label">Coming Soon</span>
+          </div>
+        </div>
+
+        <div class="blog-card coming-soon-card reveal">
+          <div class="blog-card-body">
+            <div class="blog-card-icon orange">🎲</div>
+            <h3>The Arrow of Time & Entropy</h3>
+            <p class="blog-card-summary">Why does time flow forward? The second law of thermodynamics, the past hypothesis, and the deep connection between information and physics.</p>
+            <div class="blog-card-tags">
+              <span class="tag-pill orange">entropy</span>
+              <span class="tag-pill">thermodynamics</span>
+            </div>
+            <span class="coming-soon-label">Coming Soon</span>
+          </div>
+        </div>
+
+        <div class="blog-card coming-soon-card reveal">
+          <div class="blog-card-body">
+            <div class="blog-card-icon purple">🧩</div>
+            <h3>The Search for Quantum Gravity</h3>
+            <p class="blog-card-summary">String theory, loop quantum gravity, and the quest to unify the very large and the very small. The holy grail of physics.</p>
+            <div class="blog-card-tags">
+              <span class="tag-pill purple">quantum gravity</span>
+              <span class="tag-pill pink">unification</span>
+            </div>
+            <span class="coming-soon-label">Coming Soon</span>
+          </div>
+        </div>
+
+        <div class="blog-card coming-soon-card reveal">
+          <div class="blog-card-body">
+            <div class="blog-card-icon">🌐</div>
+            <h3>Multiverse & Fine-Tuning</h3>
+            <p class="blog-card-summary">Are there other universes? Why does our universe seem tuned for life? The anthropic principle and the landscape of possibilities.</p>
+            <div class="blog-card-tags">
+              <span class="tag-pill">multiverse</span>
+              <span class="tag-pill orange">philosophy</span>
+            </div>
+            <span class="coming-soon-label">Coming Soon</span>
+          </div>
+        </div>
+
       </div>
+
     </div>
   </section>
 
-  <div class="glow-orb pink" style="width:500px;height:500px;top:20%;left:50%;transform:translateX(-50%);"></div>
-  <div class="glow-orb cyan" style="width:300px;height:300px;bottom:10%;right:10%;"></div>
+  <div class="glow-orb pink" style="width:500px;height:500px;top:20%;left:-10%;"></div>
+  <div class="glow-orb cyan" style="width:400px;height:400px;bottom:15%;right:-8%;"></div>
 
   <footer class="footer">
     <div class="footer-links">
       <a href="index.html">Home</a>
       <a href="about.html">About</a>
-      <a href="flow-matching.html">Flow Matching</a>
-      <a href="samplers-flow-matching.html">Samplers</a>
+      <a href="deep-learning.html">Deep Learning</a>
       <a href="brain.html">Brain</a>
       <a href="universe.html">Universe</a>
     </div>
     <p>&copy; 2026 Deep Blog. Built with curiosity and caffeine.</p>
   </footer>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="js/main.js"></script>
+  <script src="js/universe-hero.js"></script>
 </body>
 </html>

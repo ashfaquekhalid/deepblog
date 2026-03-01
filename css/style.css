@@ -1120,6 +1120,303 @@ code:not(pre code) {
   transition: width 0.1s linear;
 }
 
+/* ── Section Landing Pages ────────────────────────────────────────────────── */
+.landing-hero {
+  position: relative;
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 8rem 2rem 3rem;
+  overflow: hidden;
+}
+
+.landing-hero .hero-canvas {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+}
+
+.landing-hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+}
+
+.landing-hero-content h1 { margin-bottom: 1rem; }
+
+.landing-hero-content p {
+  font-size: 1.15rem;
+  color: var(--text-secondary);
+  max-width: 650px;
+  margin: 0 auto;
+  line-height: 1.8;
+}
+
+.landing-body {
+  padding: 0 0 6rem;
+  position: relative;
+}
+
+/* ── Search Bar ──────────────────────────────────────────────────────────── */
+.search-wrapper {
+  max-width: 600px;
+  margin: -1.5rem auto 3rem;
+  position: relative;
+  z-index: 3;
+}
+
+.search-bar {
+  width: 100%;
+  padding: 0.9rem 1.2rem 0.9rem 3rem;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  outline: none;
+  transition: var(--transition-smooth);
+}
+
+.search-bar::placeholder {
+  color: var(--text-muted);
+}
+
+.search-bar:focus {
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1), var(--shadow-glow);
+}
+
+.search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 1rem;
+  pointer-events: none;
+}
+
+.search-clear {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  cursor: pointer;
+  opacity: 0;
+  transition: var(--transition-fast);
+  padding: 0.2rem;
+  line-height: 1;
+}
+
+.search-clear.visible {
+  opacity: 1;
+}
+
+.search-clear:hover {
+  color: var(--text-primary);
+}
+
+.no-results {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  display: none;
+}
+
+.no-results.visible {
+  display: block;
+}
+
+/* ── Blog Cards (Landing Page) ───────────────────────────────────────────── */
+.blog-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1.5rem;
+}
+
+.blog-card {
+  position: relative;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1.8rem;
+  transition: var(--transition-smooth);
+  overflow: hidden;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+}
+
+.blog-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-lg);
+  background: var(--gradient-card);
+  opacity: 0;
+  transition: var(--transition-smooth);
+}
+
+.blog-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(0, 212, 255, 0.2);
+  box-shadow: var(--shadow-glow);
+  color: inherit;
+  text-shadow: none;
+}
+
+.blog-card:hover::before { opacity: 1; }
+
+.blog-card-body {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.blog-card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+  background: rgba(0, 212, 255, 0.08);
+  border: 1px solid rgba(0, 212, 255, 0.15);
+}
+
+.blog-card-icon.purple { background: rgba(124, 58, 237, 0.1); border-color: rgba(124, 58, 237, 0.2); }
+.blog-card-icon.pink { background: rgba(244, 114, 182, 0.1); border-color: rgba(244, 114, 182, 0.2); }
+.blog-card-icon.green { background: rgba(52, 211, 153, 0.1); border-color: rgba(52, 211, 153, 0.2); }
+
+.blog-card h3 {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.35;
+}
+
+.blog-card .blog-card-summary {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  flex: 1;
+  line-height: 1.6;
+}
+
+.blog-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 0.8rem;
+  font-family: var(--font-mono);
+}
+
+.blog-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.tag-pill {
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  border-radius: 100px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  background: rgba(0, 212, 255, 0.06);
+  color: var(--accent-cyan);
+  border: 1px solid rgba(0, 212, 255, 0.12);
+  transition: var(--transition-fast);
+}
+
+.tag-pill.purple {
+  background: rgba(124, 58, 237, 0.06);
+  color: var(--accent-purple);
+  border-color: rgba(124, 58, 237, 0.15);
+}
+
+.tag-pill.green {
+  background: rgba(52, 211, 153, 0.06);
+  color: var(--accent-green);
+  border-color: rgba(52, 211, 153, 0.15);
+}
+
+.tag-pill.pink {
+  background: rgba(244, 114, 182, 0.06);
+  color: var(--accent-pink);
+  border-color: rgba(244, 114, 182, 0.15);
+}
+
+.tag-pill.orange {
+  background: rgba(251, 146, 60, 0.06);
+  color: var(--accent-orange);
+  border-color: rgba(251, 146, 60, 0.15);
+}
+
+.blog-card.filtered-out {
+  opacity: 0;
+  transform: scale(0.95);
+  pointer-events: none;
+  position: absolute;
+  visibility: hidden;
+}
+
+.blog-card.filtered-in {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ── Coming Soon Card Variant ────────────────────────────────────────────── */
+.coming-soon-card {
+  border-style: dashed;
+  border-color: var(--border-subtle);
+}
+
+.coming-soon-card:hover {
+  border-style: dashed;
+  transform: none;
+  box-shadow: none;
+  cursor: default;
+}
+
+.coming-soon-label {
+  display: inline-block;
+  padding: 0.2rem 0.7rem;
+  border-radius: 100px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  background: rgba(251, 146, 60, 0.1);
+  color: var(--accent-orange);
+  border: 1px solid rgba(251, 146, 60, 0.2);
+  margin-top: auto;
+}
+
+/* ── Landing page responsive ─────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .landing-hero { min-height: 45vh; padding: 6rem 1.2rem 2rem; }
+  .search-wrapper { margin: -1rem 1rem 2rem; }
+  .blog-cards-grid { grid-template-columns: 1fr; }
+}
+
 /* ── Dropdown Navigation ──────────────────────────────────────────────────── */
 .nav-dropdown {
   position: relative;

@@ -21,61 +21,131 @@
     <ul class="nav-links" id="navLinks">
       <li><a href="index.html">Home</a></li>
       <li><a href="about.html">About</a></li>
-      <li class="nav-dropdown">
-        <a href="#">Deep Learning ▾</a>
-        <ul class="dropdown-menu">
-          <li><a href="flow-matching.html">Flow Matching</a></li>
-          <li><a href="samplers-flow-matching.html">Samplers</a></li>
-        </ul>
-      </li>
+      <li><a href="deep-learning.html">Deep Learning</a></li>
       <li><a href="brain.html" class="active">Brain</a></li>
       <li><a href="universe.html">Universe</a></li>
     </ul>
   </nav>
 
-  <section class="coming-soon">
-    <div class="coming-soon-content">
-      <span class="coming-soon-icon">🧬</span>
-      <h1>Human Brain &<br><span class="gradient-text">Consciousness</span></h1>
-      <p>Exploring the most complex structure in the known universe. From neurons to qualia — the hard problem awaits.</p>
-      <div class="btn-group">
-        <a href="index.html" class="btn btn-secondary">← Back Home</a>
+  <!-- Hero with 3D brain animation -->
+  <section class="landing-hero">
+    <canvas class="hero-canvas" id="brainHeroCanvas"></canvas>
+    <div class="landing-hero-content">
+      <div class="hero-badge" style="background: rgba(124,58,237,0.08); border-color: rgba(124,58,237,0.2); color: var(--accent-purple);">
+        <span class="dot" style="background: var(--accent-purple);"></span>
+        Neuroscience
       </div>
+      <h1>Human Brain &<br><span class="gradient-text">Consciousness</span></h1>
+      <p>Exploring the most complex structure in the known universe. From neurons to qualia, from the connectome to the hard problem — the deepest mysteries await.</p>
+    </div>
+    <div class="hero-overlay"></div>
+  </section>
 
-      <div style="margin-top: 4rem; max-width: 500px; margin-left: auto; margin-right: auto;">
-        <div class="card" style="text-align: left; margin-bottom: 1rem;">
-          <div class="card-content">
-            <h4 style="color: var(--accent-purple);">Planned Topics</h4>
-            <ul style="color: var(--text-secondary); margin-top: 0.8rem;">
-              <li>Neuroscience fundamentals — how neurons compute</li>
-              <li>The connectome and brain architecture</li>
-              <li>Theories of consciousness (IIT, GWT, Predictive Processing)</li>
-              <li>The hard problem of consciousness</li>
-              <li>Brain-computer interfaces</li>
-              <li>Artificial vs biological intelligence</li>
-              <li>Memory, learning, and plasticity</li>
-              <li>Perception, illusions, and constructed reality</li>
-            </ul>
+  <!-- Coming Soon Blog Cards -->
+  <section class="landing-body">
+    <div class="container">
+
+      <div class="blog-cards-grid">
+
+        <div class="blog-card coming-soon-card reveal">
+          <div class="blog-card-body">
+            <div class="blog-card-icon purple">🧬</div>
+            <h3>How Neurons Compute</h3>
+            <p class="blog-card-summary">From action potentials to synaptic plasticity — the fundamental computational unit of the brain, explained from first principles.</p>
+            <div class="blog-card-tags">
+              <span class="tag-pill purple">neuroscience</span>
+              <span class="tag-pill">computation</span>
+            </div>
+            <span class="coming-soon-label">Coming Soon</span>
           </div>
         </div>
+
+        <div class="blog-card coming-soon-card reveal">
+          <div class="blog-card-body">
+            <div class="blog-card-icon pink">🔮</div>
+            <h3>Theories of Consciousness</h3>
+            <p class="blog-card-summary">Integrated Information Theory, Global Workspace Theory, Predictive Processing — the leading frameworks for understanding subjective experience.</p>
+            <div class="blog-card-tags">
+              <span class="tag-pill pink">consciousness</span>
+              <span class="tag-pill purple">philosophy</span>
+            </div>
+            <span class="coming-soon-label">Coming Soon</span>
+          </div>
+        </div>
+
+        <div class="blog-card coming-soon-card reveal">
+          <div class="blog-card-body">
+            <div class="blog-card-icon">🧠</div>
+            <h3>The Connectome</h3>
+            <p class="blog-card-summary">Mapping the brain's wiring diagram — 86 billion neurons, 100 trillion connections. How structure gives rise to function.</p>
+            <div class="blog-card-tags">
+              <span class="tag-pill">connectome</span>
+              <span class="tag-pill purple">architecture</span>
+            </div>
+            <span class="coming-soon-label">Coming Soon</span>
+          </div>
+        </div>
+
+        <div class="blog-card coming-soon-card reveal">
+          <div class="blog-card-body">
+            <div class="blog-card-icon green">⚡</div>
+            <h3>Memory, Learning & Plasticity</h3>
+            <p class="blog-card-summary">How the brain rewires itself. From Hebbian learning to long-term potentiation — the biological roots of machine learning.</p>
+            <div class="blog-card-tags">
+              <span class="tag-pill green">plasticity</span>
+              <span class="tag-pill">learning</span>
+            </div>
+            <span class="coming-soon-label">Coming Soon</span>
+          </div>
+        </div>
+
+        <div class="blog-card coming-soon-card reveal">
+          <div class="blog-card-body">
+            <div class="blog-card-icon pink">👁️</div>
+            <h3>Perception & Constructed Reality</h3>
+            <p class="blog-card-summary">Your brain doesn't show you reality — it constructs a useful hallucination. Illusions, predictive coding, and the Bayesian brain.</p>
+            <div class="blog-card-tags">
+              <span class="tag-pill pink">perception</span>
+              <span class="tag-pill orange">illusions</span>
+            </div>
+            <span class="coming-soon-label">Coming Soon</span>
+          </div>
+        </div>
+
+        <div class="blog-card coming-soon-card reveal">
+          <div class="blog-card-body">
+            <div class="blog-card-icon purple">🤖</div>
+            <h3>Artificial vs Biological Intelligence</h3>
+            <p class="blog-card-summary">What neural networks get right — and wrong — about the brain. Can machines ever be conscious? The deep parallels and divergences.</p>
+            <div class="blog-card-tags">
+              <span class="tag-pill purple">AI</span>
+              <span class="tag-pill">comparison</span>
+            </div>
+            <span class="coming-soon-label">Coming Soon</span>
+          </div>
+        </div>
+
       </div>
+
     </div>
   </section>
 
-  <div class="glow-orb purple" style="width:500px;height:500px;top:20%;left:50%;transform:translateX(-50%);"></div>
+  <div class="glow-orb purple" style="width:500px;height:500px;top:20%;left:-10%;"></div>
+  <div class="glow-orb pink" style="width:400px;height:400px;bottom:15%;right:-8%;"></div>
 
   <footer class="footer">
     <div class="footer-links">
       <a href="index.html">Home</a>
       <a href="about.html">About</a>
-      <a href="flow-matching.html">Flow Matching</a>
-      <a href="samplers-flow-matching.html">Samplers</a>
+      <a href="deep-learning.html">Deep Learning</a>
       <a href="brain.html">Brain</a>
       <a href="universe.html">Universe</a>
     </div>
     <p>&copy; 2026 Deep Blog. Built with curiosity and caffeine.</p>
   </footer>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="js/main.js"></script>
+  <script src="js/brain-hero.js"></script>
 </body>
 </html>
