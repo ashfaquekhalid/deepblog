@@ -1120,6 +1120,122 @@ code:not(pre code) {
   transition: width 0.1s linear;
 }
 
+/* ── Dropdown Navigation ──────────────────────────────────────────────────── */
+.nav-dropdown {
+  position: relative;
+}
+
+.nav-dropdown .dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(6, 6, 14, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 0.5rem 0;
+  list-style: none;
+  min-width: 180px;
+  box-shadow: var(--shadow-card);
+  z-index: 1001;
+}
+
+.nav-dropdown:hover .dropdown-menu {
+  display: block;
+}
+
+.nav-dropdown .dropdown-menu li {
+  margin: 0;
+}
+
+.nav-dropdown .dropdown-menu a {
+  display: block;
+  padding: 0.5rem 1.2rem;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  white-space: nowrap;
+  transition: var(--transition-fast);
+}
+
+.nav-dropdown .dropdown-menu a:hover {
+  color: var(--accent-cyan);
+  background: rgba(0, 212, 255, 0.05);
+}
+
+.nav-dropdown .dropdown-menu a.active {
+  color: var(--accent-cyan);
+}
+
+@media (max-width: 768px) {
+  .nav-dropdown .dropdown-menu {
+    position: static;
+    transform: none;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    display: none;
+    padding-left: 1rem;
+    backdrop-filter: none;
+  }
+
+  .nav-dropdown:hover .dropdown-menu,
+  .nav-links.open .nav-dropdown .dropdown-menu {
+    display: block;
+  }
+}
+
+/* ── Sampler Legend ──────────────────────────────────────────────────────── */
+.sampler-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 0.8rem;
+  padding: 0.6rem 0;
+}
+
+.legend-item {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-family: var(--font-mono);
+  color: var(--legend-color, var(--text-secondary));
+}
+
+/* ── Select Styling ──────────────────────────────────────────────────────── */
+.controls select {
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--bg-glass) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%238b949e' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 0.6rem center;
+  background-size: 12px;
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 0.4rem 2rem 0.4rem 0.8rem;
+  font-family: var(--font-heading);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.controls select:hover {
+  border-color: var(--accent-cyan);
+}
+
+.controls select:focus {
+  outline: none;
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.15);
+}
+
+.controls select option {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
 /* ── Particle background ──────────────────────────────────────────────────── */
 .bg-particles {
   position: fixed;

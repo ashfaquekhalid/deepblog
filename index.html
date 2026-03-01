@@ -23,7 +23,13 @@
     <ul class="nav-links" id="navLinks">
       <li><a href="index.html" class="active">Home</a></li>
       <li><a href="about.html">About</a></li>
-      <li><a href="flow-matching.html">Deep Learning</a></li>
+      <li class="nav-dropdown">
+        <a href="#">Deep Learning ▾</a>
+        <ul class="dropdown-menu">
+          <li><a href="flow-matching.html">Flow Matching</a></li>
+          <li><a href="samplers-flow-matching.html">Samplers</a></li>
+        </ul>
+      </li>
       <li><a href="brain.html">Brain</a></li>
       <li><a href="universe.html">Universe</a></li>
     </ul>
@@ -40,7 +46,7 @@
       <h1>Where <span class="gradient-text">Deep Learning</span> Meets the Mysteries of <span class="gradient-text">Mind & Cosmos</span></h1>
       <p>A deep dive into the mathematics of intelligence — from neural architectures and generative models to the enigma of consciousness and the structure of our universe.</p>
       <div class="btn-group">
-        <a href="flow-matching.html" class="btn btn-primary">Read Latest Blog →</a>
+        <a href="samplers-flow-matching.html" class="btn btn-primary">Read Latest Blog →</a>
         <a href="about.html" class="btn btn-secondary">About Me</a>
       </div>
     </div>
@@ -59,12 +65,12 @@
       <div class="cards-grid">
 
         <!-- Deep Learning Card -->
-        <a href="flow-matching.html" class="card reveal reveal-delay-1">
+        <a href="samplers-flow-matching.html" class="card reveal reveal-delay-1">
           <div class="card-content">
             <div class="card-icon">🧠</div>
             <h3>Deep Learning</h3>
-            <p>From the mathematics of neural networks to state-of-the-art generative models. Currently featuring a comprehensive deep dive into Flow Matching.</p>
-            <span class="card-tag new">Latest: Flow Matching</span>
+            <p>From the mathematics of neural networks to state-of-the-art generative models. Featuring deep dives into Flow Matching and ODE Samplers with interactive 3D demos.</p>
+            <span class="card-tag new">Latest: Samplers for Flow Matching</span>
           </div>
         </a>
 
@@ -92,43 +98,48 @@
     </div>
   </section>
 
-  <!-- Featured Article Preview -->
+  <!-- Featured Articles Preview -->
   <section id="featured">
     <div class="container">
       <div class="section-header reveal">
-        <span class="overline">Featured</span>
-        <h2>Flow Matching: <span class="gradient-text">End-to-End Guide</span></h2>
-        <p>The most comprehensive visual guide to flow matching — from probability distributions to state-of-the-art generative modeling.</p>
+        <span class="overline">Featured Series</span>
+        <h2>Flow Matching: <span class="gradient-text">From Theory to Sampling</span></h2>
+        <p>A two-part deep dive — first learn how flow matching works, then master the art of sampling from trained models.</p>
       </div>
 
       <div class="cards-grid">
-        <div class="card reveal reveal-delay-1">
+        <a href="flow-matching.html" class="card reveal reveal-delay-1">
           <div class="card-content">
             <div class="card-icon green">📐</div>
-            <h3>Mathematical Foundations</h3>
-            <p>ODEs, vector fields, probability paths, and the continuity equation — built from first principles with interactive visualizations.</p>
+            <h3>Part 1: Flow Matching Guide</h3>
+            <p>From probability distributions to conditional flow matching. ODEs, velocity fields, optimal transport paths, and PyTorch implementation with 3D interactive demos.</p>
+            <span class="card-tag new">35 min read</span>
           </div>
-        </div>
+        </a>
 
-        <div class="card reveal reveal-delay-2">
+        <a href="samplers-flow-matching.html" class="card reveal reveal-delay-2">
           <div class="card-content">
             <div class="card-icon">🎯</div>
-            <h3>3D Interactive Demos</h3>
-            <p>Watch particles flow from noise to data in real-time 3D. Manipulate the velocity field and explore the geometry of generative modeling.</p>
+            <h3>Part 2: Samplers Deep Dive</h3>
+            <p>Euler, Midpoint, Heun, RK4, adaptive methods, stochastic samplers, and distillation — with interactive side-by-side comparisons showing how each solver traces its path.</p>
+            <span class="card-tag new">New — 30 min read</span>
           </div>
-        </div>
+        </a>
 
         <div class="card reveal reveal-delay-3">
           <div class="card-content">
             <div class="card-icon purple">⚡</div>
-            <h3>From Theory to Practice</h3>
-            <p>Complete training algorithm, PyTorch implementation, connections to diffusion models, and advanced topics like mini-batch OT.</p>
+            <h3>Interactive Animations</h3>
+            <p>Both articles feature real-time 3D particle simulations you can drag, zoom, and control — watch particles flow from noise to data with different ODE solvers.</p>
           </div>
         </div>
       </div>
 
       <div style="text-align: center; margin-top: 3rem;" class="reveal">
-        <a href="flow-matching.html" class="btn btn-primary">Read the Full Article →</a>
+        <div class="btn-group">
+          <a href="flow-matching.html" class="btn btn-secondary">Part 1: Flow Matching →</a>
+          <a href="samplers-flow-matching.html" class="btn btn-primary">Part 2: Samplers →</a>
+        </div>
       </div>
     </div>
   </section>
@@ -142,7 +153,8 @@
     <div class="footer-links">
       <a href="index.html">Home</a>
       <a href="about.html">About</a>
-      <a href="flow-matching.html">Deep Learning</a>
+      <a href="flow-matching.html">Flow Matching</a>
+      <a href="samplers-flow-matching.html">Samplers</a>
       <a href="brain.html">Brain</a>
       <a href="universe.html">Universe</a>
     </div>

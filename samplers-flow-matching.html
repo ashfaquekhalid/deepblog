@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Samplers for Flow Matching — Deep Blog</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+</head>
+<body>
+
+  <div class="scroll-progress" id="scrollProgress"></div>
+
+  <!-- Table of Contents (left sidebar) -->
+  <div class="toc" id="toc">
+    <a href="#intro" data-label="Introduction" class="active"></a>
+    <a href="#ode-problem" data-label="The ODE Problem"></a>
+    <a href="#euler" data-label="Euler Method"></a>
+    <a href="#demo-euler" data-label="Euler Demo"></a>
+    <a href="#midpoint" data-label="Midpoint Method"></a>
+    <a href="#heun" data-label="Heun's Method"></a>
+    <a href="#rk4" data-label="Runge-Kutta 4"></a>
+    <a href="#demo-compare" data-label="Sampler Comparison"></a>
+    <a href="#adaptive" data-label="Adaptive Methods"></a>
+    <a href="#demo-adaptive" data-label="Adaptive Demo"></a>
+    <a href="#stochastic" data-label="Stochastic Samplers"></a>
+    <a href="#distillation" data-label="Few-Step Methods"></a>
+    <a href="#demo-steps" data-label="Step Count Demo"></a>
+    <a href="#practical" data-label="Practical Guide"></a>
+    <a href="#code" data-label="Code"></a>
+  </div>
+
+  <nav class="navbar" id="navbar">
+    <a href="index.html" class="nav-brand">⟨deep/blog⟩</a>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li class="nav-dropdown">
+        <a href="#" class="active">Deep Learning ▾</a>
+        <ul class="dropdown-menu">
+          <li><a href="flow-matching.html">Flow Matching</a></li>
+          <li><a href="samplers-flow-matching.html" class="active">Samplers</a></li>
+        </ul>
+      </li>
+      <li><a href="brain.html">Brain</a></li>
+      <li><a href="universe.html">Universe</a></li>
+    </ul>
+  </nav>
+
+  <!-- Blog Hero -->
+  <section class="blog-hero">
+    <canvas class="hero-canvas" id="blogHeroCanvas"></canvas>
+    <div class="blog-hero-content">
+      <div class="hero-badge">
+        <span class="dot"></span>
+        Deep Learning
+      </div>
+      <h1>Samplers for Flow Matching:<br><span class="gradient-text">From Euler to Adaptive ODE Solvers</span></h1>
+      <p style="color: var(--text-secondary); font-size: 1.15rem; max-width: 700px; margin: 0 auto 1.5rem;">
+        You've trained a velocity field. Now how do you actually generate samples? A deep dive into ODE solvers — Euler, Midpoint, Heun, RK4, adaptive methods, and beyond — with interactive visualizations showing exactly how each sampler traces its path through probability space.
+      </p>
+      <div class="blog-meta">
+        <span>📅 March 2026</span>
+        <span>⏱ 30 min read</span>
+        <span>📊 Intermediate → Advanced</span>
+      </div>
+      <div style="margin-top: 1rem;">
+        <a href="flow-matching.html" class="btn btn-secondary" style="font-size: 0.85rem; padding: 0.5rem 1.2rem;">← Prerequisite: Flow Matching Guide</a>
+      </div>
+    </div>
+    <div class="hero-overlay"></div>
+  </section>
+
+  <!-- Blog Content -->
+  <article class="blog-article">
+    <div class="container-narrow">
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           1. INTRODUCTION
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="intro">1. Introduction — The Sampling Problem</h2>
+
+      <p>In our <a href="flow-matching.html">previous deep dive into flow matching</a>, we learned how to train a neural network <span class="inline-math" data-math="v_\theta(x, t)"></span> that learns a velocity field transporting noise into data. Training was beautifully simple — a single MSE loss between predicted and target velocities.</p>
+
+      <p>But here's the thing: <strong>training is only half the story</strong>. Once you have that velocity field, you need to actually <em>use</em> it to generate samples. This means solving an Ordinary Differential Equation (ODE):</p>
+
+      <div class="math-block" data-math="\frac{dx}{dt} = v_\theta(x, t), \quad x(0) \sim \mathcal{N}(0, I), \quad t \in [0, 1]"></div>
+
+      <p>Starting from a random noise sample at <span class="inline-math" data-math="t = 0"></span>, you follow the velocity field forward in time to arrive at a generated sample at <span class="inline-math" data-math="t = 1"></span>. The question is: <strong>how do you numerically solve this ODE?</strong></p>
+
+      <div class="callout insight">
+        <div class="callout-title">Why This Matters</div>
+        <p>The choice of ODE solver (sampler) directly determines three critical factors: <strong>sample quality</strong> (how close you get to the true data distribution), <strong>speed</strong> (how many neural network evaluations you need), and <strong>memory usage</strong>. A good sampler can generate high-quality images in 10 steps; a bad one might need 1000.</p>
+      </div>
+
+      <p>Each evaluation of <span class="inline-math" data-math="v_\theta(x, t)"></span> is called a <strong>Number of Function Evaluations (NFE)</strong> — and since each one requires a full forward pass through a large neural network, minimizing NFE while maintaining quality is the central tension in sampler design.</p>
+
+      <p>In this article, we'll build up from the simplest sampler to the most sophisticated, with interactive visualizations showing exactly how each one traces its path through the probability landscape.</p>
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           2. THE ODE PROBLEM
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="ode-problem">2. The ODE We're Solving</h2>
+
+      <p>Let's set up the problem precisely. We have a trained neural network <span class="inline-math" data-math="v_\theta: \mathbb{R}^d \times [0,1] \to \mathbb{R}^d"></span> that represents a time-dependent velocity field. The generative process requires solving the <strong>Initial Value Problem (IVP)</strong>:</p>
+
+      <div class="math-block" data-math="\begin{cases} \frac{dx(t)}{dt} = v_\theta(x(t), t) \\ x(0) = x_0 \sim \mathcal{N}(0, I) \end{cases}"></div>
+
+      <p>We want to compute <span class="inline-math" data-math="x(1)"></span> — the final generated sample. Since we can't solve this analytically (the velocity field is a neural network), we must <strong>discretize</strong> time into steps and approximate the solution numerically.</p>
+
+      <h3>2.1 Discretization</h3>
+
+      <p>We choose <span class="inline-math" data-math="N"></span> time steps with a schedule <span class="inline-math" data-math="0 = t_0 < t_1 < t_2 < \cdots < t_N = 1"></span>. The simplest schedule is uniform: <span class="inline-math" data-math="t_i = i/N"></span>, giving a constant step size <span class="inline-math" data-math="h = 1/N"></span>.</p>
+
+      <p>At each step, we use the velocity field to update our current position. Different samplers differ in <strong>how</strong> they use the velocity field information to compute the next position — and this makes all the difference.</p>
+
+      <h3>2.2 The Local Truncation Error Perspective</h3>
+
+      <p>Each numerical step introduces some error compared to the true ODE solution. The <strong>local truncation error (LTE)</strong> measures how much error a single step introduces. For a method of <strong>order <span class="inline-math" data-math="p"></span></strong>:</p>
+
+      <div class="math-block" data-math="\text{LTE} = \mathcal{O}(h^{p+1})"></div>
+
+      <p>The <strong>global error</strong> after <span class="inline-math" data-math="N"></span> steps scales as <span class="inline-math" data-math="\mathcal{O}(h^p) = \mathcal{O}(N^{-p})"></span>. A higher-order method converges faster as you increase the number of steps, but each step typically requires more function evaluations.</p>
+
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Sampler</th>
+            <th>Order</th>
+            <th>NFE / Step</th>
+            <th>Global Error</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Euler</strong></td>
+            <td>1</td>
+            <td>1</td>
+            <td><span class="inline-math" data-math="\mathcal{O}(h)"></span></td>
+          </tr>
+          <tr>
+            <td><strong>Midpoint</strong></td>
+            <td>2</td>
+            <td>2</td>
+            <td><span class="inline-math" data-math="\mathcal{O}(h^2)"></span></td>
+          </tr>
+          <tr>
+            <td><strong>Heun</strong></td>
+            <td>2</td>
+            <td>2</td>
+            <td><span class="inline-math" data-math="\mathcal{O}(h^2)"></span></td>
+          </tr>
+          <tr>
+            <td><strong style="color: var(--accent-cyan);">RK4</strong></td>
+            <td>4</td>
+            <td>4</td>
+            <td><span class="inline-math" data-math="\mathcal{O}(h^4)"></span></td>
+          </tr>
+          <tr>
+            <td><strong>Dormand-Prince</strong></td>
+            <td>4/5</td>
+            <td>6</td>
+            <td>Adaptive</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           3. EULER METHOD
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="euler">3. Euler's Method — The Simplest Sampler</h2>
+
+      <p>The <strong>Euler method</strong> (also called Forward Euler) is the most basic numerical ODE solver. The idea is brutally simple: at each step, evaluate the velocity field at the current position and move in that direction for the full step.</p>
+
+      <div class="math-block" data-math="x_{n+1} = x_n + h \cdot v_\theta(x_n, t_n)"></div>
+
+      <p>where <span class="inline-math" data-math="h = t_{n+1} - t_n"></span> is the step size. This is a <strong>first-order method</strong> — its local truncation error is <span class="inline-math" data-math="\mathcal{O}(h^2)"></span> per step, leading to a global error of <span class="inline-math" data-math="\mathcal{O}(h)"></span>.</p>
+
+      <h3>3.1 Geometric Intuition</h3>
+
+      <p>Think of Euler's method like driving a car while only looking at your compass at the start of each block. You check your direction, drive straight for one block, then check again. If the road curves, you'll overshoot or undershoot because you didn't account for how the direction was changing <em>during</em> the block.</p>
+
+      <div class="callout warning">
+        <div class="callout-title">Euler's Weakness</div>
+        <p>Euler's method only uses the velocity at the <strong>start</strong> of each step. If the velocity field is curved (which it almost always is in practice), the method will drift off the true trajectory. For strongly curved velocity fields, this can lead to significant errors even with many steps.</p>
+      </div>
+
+      <h3>3.2 Why Euler Often Works for Flow Matching</h3>
+
+      <p>Despite being the simplest method, Euler's method works surprisingly well for flow matching — better than it does for diffusion models. The reason is that <strong>OT-CFM produces nearly straight trajectories</strong>. When the true trajectory is almost a straight line, Euler's method (which assumes a locally straight path) makes very little error at each step.</p>
+
+      <p>This is one of the key advantages of flow matching over diffusion models: the trajectories are straighter, so simpler solvers work better, and you need fewer steps.</p>
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           4. INTERACTIVE DEMO — EULER STEP VISUALIZATION
+           ════════════════════════════════════════════════════════════════════ -->
+      <div class="interactive-section" id="demo-euler">
+        <h4>Interactive Demo: Euler Method Step-by-Step</h4>
+        <p class="subtitle">Watch how Euler's method approximates the ODE trajectory. The dashed line shows the true path; solid segments show Euler steps. Adjust step count to see how accuracy improves. Drag to rotate.</p>
+        <div class="canvas-container" id="eulerCanvas"></div>
+        <div class="controls">
+          <label>Steps:</label>
+          <input type="range" id="eulerSteps" min="2" max="50" step="1" value="5">
+          <span class="value-display" id="eulerStepsDisplay">N = 5</span>
+          <button id="eulerPlayBtn">▶ Animate</button>
+          <button id="eulerResetBtn">↺ Reset</button>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           5. MIDPOINT METHOD
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="midpoint">4. Midpoint Method — Looking Ahead</h2>
+
+      <p>The midpoint method improves on Euler by taking a "peek ahead" to the middle of the step. It's a <strong>second-order</strong> Runge-Kutta method (RK2).</p>
+
+      <h3>4.1 The Algorithm</h3>
+
+      <p>Instead of blindly using the velocity at the start, the midpoint method:</p>
+      <ol>
+        <li>Takes a half-step using Euler to estimate where you'll be at the midpoint</li>
+        <li>Evaluates the velocity field at that midpoint</li>
+        <li>Uses the midpoint velocity to take the full step from the original position</li>
+      </ol>
+
+      <div class="math-block" data-math="\begin{aligned} k_1 &= v_\theta(x_n, t_n) \\ k_2 &= v_\theta\!\left(x_n + \tfrac{h}{2} k_1, \; t_n + \tfrac{h}{2}\right) \\ x_{n+1} &= x_n + h \cdot k_2 \end{aligned}"></div>
+
+      <div class="callout insight">
+        <div class="callout-title">Intuition</div>
+        <p>It's like driving: instead of only looking at your GPS at the start of each block, you also look ahead halfway through the block and adjust your direction. This captures first-order curvature information. The cost is 2 NFE per step instead of 1.</p>
+      </div>
+
+      <h3>4.2 Error Analysis</h3>
+
+      <p>The midpoint method has LTE of <span class="inline-math" data-math="\mathcal{O}(h^3)"></span> and global error <span class="inline-math" data-math="\mathcal{O}(h^2)"></span>. This means doubling the number of steps reduces error by <span class="inline-math" data-math="4\times"></span> (versus <span class="inline-math" data-math="2\times"></span> for Euler). Since each step costs 2 NFE, the total cost for <span class="inline-math" data-math="N"></span> steps is <span class="inline-math" data-math="2N"></span> NFE — but you typically need far fewer steps than Euler for the same accuracy.</p>
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           6. HEUN'S METHOD
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="heun">5. Heun's Method — The Predictor-Corrector</h2>
+
+      <p><strong>Heun's method</strong> (also called the Improved Euler method or Explicit Trapezoidal method) is another second-order method, but with a different geometric flavor. It uses a <strong>predictor-corrector</strong> strategy.</p>
+
+      <h3>5.1 The Algorithm</h3>
+
+      <div class="steps">
+        <div class="step">
+          <p><strong>Predict:</strong> Take a full Euler step to <em>predict</em> where you'll end up: <span class="inline-math" data-math="\tilde{x}_{n+1} = x_n + h \cdot v_\theta(x_n, t_n)"></span></p>
+        </div>
+        <div class="step">
+          <p><strong>Evaluate:</strong> Compute the velocity at the predicted endpoint: <span class="inline-math" data-math="v_\theta(\tilde{x}_{n+1}, t_{n+1})"></span></p>
+        </div>
+        <div class="step">
+          <p><strong>Correct:</strong> Take the final step using the <em>average</em> of start and end velocities: <span class="inline-math" data-math="x_{n+1} = x_n + \tfrac{h}{2}\big[v_\theta(x_n, t_n) + v_\theta(\tilde{x}_{n+1}, t_{n+1})\big]"></span></p>
+        </div>
+      </div>
+
+      <p>In Runge-Kutta notation:</p>
+
+      <div class="math-block" data-math="\begin{aligned} k_1 &= v_\theta(x_n, t_n) \\ k_2 &= v_\theta(x_n + h \cdot k_1, \; t_n + h) \\ x_{n+1} &= x_n + \frac{h}{2}(k_1 + k_2) \end{aligned}"></div>
+
+      <h3>5.2 Heun vs Midpoint</h3>
+
+      <p>Both are second-order, both require 2 NFE per step, but they sample the velocity field at different locations:</p>
+
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Method</th>
+            <th>Evaluation Points</th>
+            <th>Strategy</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Midpoint</strong></td>
+            <td><span class="inline-math" data-math="t_n"></span> and <span class="inline-math" data-math="t_n + h/2"></span></td>
+            <td>Sample at midpoint, use that velocity for full step</td>
+          </tr>
+          <tr>
+            <td><strong>Heun</strong></td>
+            <td><span class="inline-math" data-math="t_n"></span> and <span class="inline-math" data-math="t_n + h"></span></td>
+            <td>Sample at both endpoints, average the velocities</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout key">
+        <div class="callout-title">Heun's Method in Practice</div>
+        <p>Heun's method is particularly popular in flow matching / diffusion model sampling because the predictor-corrector structure aligns well with how these models work. The Karras et al. (2022) noise schedule sampler (used in Stable Diffusion) is essentially Heun's method adapted to the specific ODE formulation. It tends to slightly outperform midpoint for velocity fields with more curvature near the endpoints.</p>
+      </div>
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           7. RUNGE-KUTTA 4
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="rk4">6. Runge-Kutta 4 — The Gold Standard</h2>
+
+      <p>The <strong>classic fourth-order Runge-Kutta method (RK4)</strong> is one of the most celebrated algorithms in all of numerical analysis. It achieves fourth-order accuracy by evaluating the velocity field at <strong>four</strong> carefully chosen points within each step.</p>
+
+      <h3>6.1 The Algorithm</h3>
+
+      <div class="math-block" data-math="\begin{aligned} k_1 &= v_\theta(x_n, \; t_n) \\ k_2 &= v_\theta\!\left(x_n + \tfrac{h}{2}k_1, \; t_n + \tfrac{h}{2}\right) \\ k_3 &= v_\theta\!\left(x_n + \tfrac{h}{2}k_2, \; t_n + \tfrac{h}{2}\right) \\ k_4 &= v_\theta(x_n + h \, k_3, \; t_n + h) \\ x_{n+1} &= x_n + \frac{h}{6}\big(k_1 + 2k_2 + 2k_3 + k_4\big) \end{aligned}"></div>
+
+      <h3>6.2 Why These Specific Weights?</h3>
+
+      <p>The weights <span class="inline-math" data-math="(1, 2, 2, 1)/6"></span> and evaluation points aren't arbitrary — they're derived from <strong>Taylor series matching</strong>. RK4 matches the Taylor expansion of the exact solution up to and including the <span class="inline-math" data-math="h^4"></span> term. The four evaluations sample the velocity at:</p>
+
+      <ul>
+        <li><span class="inline-math" data-math="k_1"></span>: Beginning of the interval (slope at start)</li>
+        <li><span class="inline-math" data-math="k_2"></span>: Midpoint, using <span class="inline-math" data-math="k_1"></span> to step there (first midpoint estimate)</li>
+        <li><span class="inline-math" data-math="k_3"></span>: Midpoint again, but using <span class="inline-math" data-math="k_2"></span> (refined midpoint estimate)</li>
+        <li><span class="inline-math" data-math="k_4"></span>: End of the interval, using <span class="inline-math" data-math="k_3"></span> to step there (slope at end)</li>
+      </ul>
+
+      <p>The weighted average gives the midpoint slopes double weight, following Simpson's rule from numerical integration.</p>
+
+      <h3>6.3 Trade-offs</h3>
+
+      <p>RK4 uses <strong>4 NFE per step</strong>. For the same total budget of neural network evaluations, is it better to use RK4 with <span class="inline-math" data-math="N"></span> steps or Euler with <span class="inline-math" data-math="4N"></span> steps?</p>
+
+      <div class="callout insight">
+        <div class="callout-title">RK4 vs More Euler Steps</div>
+        <p>With a budget of <span class="inline-math" data-math="B"></span> total NFE: Euler achieves error <span class="inline-math" data-math="\mathcal{O}(1/B)"></span>, while RK4 achieves error <span class="inline-math" data-math="\mathcal{O}(1/(B/4)^4) = \mathcal{O}(256/B^4)"></span>. For <span class="inline-math" data-math="B \geq 5"></span>, RK4 wins dramatically. With 20 NFE: Euler error ~ <span class="inline-math" data-math="1/20 = 0.05"></span>, RK4 error ~ <span class="inline-math" data-math="1/5^4 = 0.0016"></span> — a <span class="inline-math" data-math="30\times"></span> improvement!</p>
+      </div>
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           8. INTERACTIVE DEMO — SAMPLER COMPARISON
+           ════════════════════════════════════════════════════════════════════ -->
+      <div class="interactive-section" id="demo-compare">
+        <h4>Interactive Demo: Sampler Comparison</h4>
+        <p class="subtitle">Watch four samplers solve the same ODE simultaneously. Each uses the same total step budget but different methods. The true trajectory is shown in white. Drag to rotate, scroll to zoom.</p>
+        <div class="canvas-container" id="compareCanvas" style="height: 500px;"></div>
+        <div class="controls">
+          <label>Steps:</label>
+          <input type="range" id="compareSteps" min="3" max="30" step="1" value="8">
+          <span class="value-display" id="compareStepsDisplay">N = 8</span>
+          <button id="comparePlayBtn">▶ Animate</button>
+          <button id="compareResetBtn">↺ Reset</button>
+        </div>
+        <div class="sampler-legend">
+          <span class="legend-item" style="--legend-color: #ff6b6b;">● Euler (1st order)</span>
+          <span class="legend-item" style="--legend-color: #ffd93d;">● Midpoint (2nd order)</span>
+          <span class="legend-item" style="--legend-color: #6bcb77;">● Heun (2nd order)</span>
+          <span class="legend-item" style="--legend-color: #4d96ff;">● RK4 (4th order)</span>
+          <span class="legend-item" style="--legend-color: rgba(255,255,255,0.5);">┄ True trajectory</span>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           9. ADAPTIVE METHODS
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="adaptive">7. Adaptive Step-Size Methods</h2>
+
+      <p>All the methods above use a <strong>fixed step size</strong> — the same <span class="inline-math" data-math="h"></span> for every step. But think about it: the velocity field isn't equally complex everywhere. In regions where it's nearly constant (like early in generation when particles are spread out), large steps work fine. In regions where it changes rapidly (like near the data distribution where particles converge), you need small steps for accuracy.</p>
+
+      <p><strong>Adaptive methods</strong> automatically adjust the step size based on an estimate of the local error.</p>
+
+      <h3>7.1 Error Estimation via Embedded Methods</h3>
+
+      <p>The most elegant approach uses <strong>embedded Runge-Kutta pairs</strong>. You compute two approximations of different orders using (mostly) the same function evaluations, then use their difference as an error estimate:</p>
+
+      <div class="math-block" data-math="\text{err} = \|x_{n+1}^{(p)} - x_{n+1}^{(p-1)}\|"></div>
+
+      <p>If the error is below a tolerance <span class="inline-math" data-math="\varepsilon"></span>, accept the step and try a larger step next time. If it's above, reject the step and retry with a smaller step.</p>
+
+      <h3>7.2 Dormand-Prince (dopri5)</h3>
+
+      <p>The most widely used adaptive method is <strong>Dormand-Prince</strong> (the algorithm behind MATLAB's <code>ode45</code>, SciPy's <code>solve_ivp</code>, and torchdiffeq's <code>dopri5</code>). It's an embedded RK4(5) method:</p>
+
+      <ul>
+        <li>Computes a 4th-order and a 5th-order solution using <strong>6 function evaluations</strong> (7 with FSAL optimization, but effectively 6 new ones per step)</li>
+        <li>Uses the 5th-order solution as the accepted answer</li>
+        <li>Uses the difference between 4th and 5th order solutions to estimate error</li>
+        <li>Adjusts step size using the formula: <span class="inline-math" data-math="h_{\text{new}} = h \cdot \min\!\left(5, \max\!\left(0.2, \; 0.9 \left(\varepsilon / \text{err}\right)^{1/5}\right)\right)"></span></li>
+      </ul>
+
+      <div class="callout key">
+        <div class="callout-title">Adaptive Methods for Flow Matching</div>
+        <p>Adaptive solvers are particularly valuable for flow matching because the velocity field has <strong>non-uniform complexity</strong>. Near <span class="inline-math" data-math="t = 0"></span> (noise), particles are spread out and the field is smooth → large steps work. Near <span class="inline-math" data-math="t = 1"></span> (data), particles converge to sharp modes and the field changes rapidly → small steps needed. Adaptive methods naturally concentrate their computational budget where it matters most.</p>
+      </div>
+
+      <h3>7.3 Fixed vs Adaptive: The Throughput Trade-off</h3>
+
+      <p>Adaptive methods sound ideal, but there's a practical issue in deep learning: <strong>variable step counts break batching</strong>. Different samples in a batch might need different numbers of steps, making GPU parallelism inefficient. Solutions include:</p>
+
+      <ul>
+        <li><strong>Use fixed steps for production</strong>, adaptive for research/evaluation</li>
+        <li><strong>Determine a good fixed schedule</strong> by running adaptive once and analyzing where it places steps</li>
+        <li><strong>Use a learned time schedule</strong> optimized end-to-end</li>
+      </ul>
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           10. INTERACTIVE DEMO — ADAPTIVE STEP SIZE
+           ════════════════════════════════════════════════════════════════════ -->
+      <div class="interactive-section" id="demo-adaptive">
+        <h4>Interactive Demo: Adaptive vs Fixed Step Size</h4>
+        <p class="subtitle">Compare fixed-step Euler (red) with an adaptive solver (cyan) that concentrates steps where the velocity field changes rapidly. Notice how the adaptive solver places more steps near the target clusters. Drag to rotate.</p>
+        <div class="canvas-container" id="adaptiveCanvas" style="height: 450px;"></div>
+        <div class="controls">
+          <label>Total NFE budget:</label>
+          <input type="range" id="adaptiveNFE" min="5" max="40" step="1" value="15">
+          <span class="value-display" id="adaptiveNFEDisplay">NFE = 15</span>
+          <button id="adaptivePlayBtn">▶ Animate</button>
+          <button id="adaptiveResetBtn">↺ Reset</button>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           11. STOCHASTIC SAMPLERS
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="stochastic">8. Stochastic Samplers — Adding Noise</h2>
+
+      <p>Everything so far has been <strong>deterministic</strong> — the same initial noise always produces the same output. But there's a family of <strong>stochastic samplers</strong> that inject additional noise during the generation process, converting the ODE into an SDE (Stochastic Differential Equation).</p>
+
+      <h3>8.1 Why Add Noise?</h3>
+
+      <p>Adding controlled noise during sampling can actually <em>improve</em> sample quality by correcting errors accumulated from the deterministic solver. The key insight comes from the connection between the probability flow ODE and the corresponding diffusion SDE. They generate the <strong>same marginal distribution</strong> <span class="inline-math" data-math="p_t"></span> at every time step, but the SDE explores the distribution more thoroughly.</p>
+
+      <h3>8.2 The Equivalent SDE</h3>
+
+      <p>For any flow matching velocity field <span class="inline-math" data-math="v_\theta(x, t)"></span>, there exists a family of equivalent SDEs parameterized by a noise level <span class="inline-math" data-math="\eta \geq 0"></span>:</p>
+
+      <div class="math-block" data-math="dx = \left[v_\theta(x, t) + \frac{\eta^2}{2} \nabla \log p_t(x)\right] dt + \eta \, dW_t"></div>
+
+      <p>When <span class="inline-math" data-math="\eta = 0"></span>, this reduces to the deterministic ODE. When <span class="inline-math" data-math="\eta > 0"></span>, the extra noise diffuses the sample while the corrected drift compensates. The term <span class="inline-math" data-math="\nabla \log p_t(x)"></span> is the <strong>score function</strong> — it pushes samples toward high-density regions, counteracting the noise.</p>
+
+      <h3>8.3 Practical Stochastic Samplers</h3>
+
+      <p>In practice, several approaches add stochasticity:</p>
+
+      <ul>
+        <li><strong>Stochastic Heun</strong>: Apply Heun's method to the SDE instead of the ODE</li>
+        <li><strong>Langevin corrector steps</strong>: After each ODE step, run a few Langevin MCMC corrections using the score</li>
+        <li><strong>Temperature scaling</strong>: Multiply the noise by a temperature factor to control diversity vs quality</li>
+      </ul>
+
+      <div class="callout warning">
+        <div class="callout-title">When to Use Stochastic Samplers</div>
+        <p>Stochastic samplers are most beneficial when: (1) you're using few steps and the ODE solver accumulates noticeable error, (2) the model has some training error and stochasticity helps smooth over imperfections, or (3) you want more diversity in the generated samples. For high-quality models with sufficient steps, deterministic ODE samplers often produce sharper results.</p>
+      </div>
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           12. FEW-STEP / DISTILLATION METHODS
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="distillation">9. Few-Step Generation — Beyond ODE Solvers</h2>
+
+      <p>The ultimate goal is to generate high-quality samples in as few steps as possible — ideally 1-4 steps. Several approaches push beyond standard ODE solvers:</p>
+
+      <h3>9.1 Rectified Flow (ReFlow)</h3>
+
+      <p><strong>Rectified Flow</strong> (Liu et al., 2022) is an elegant idea: once you've trained a flow matching model, use it to generate <span class="inline-math" data-math="(x_0, x_1)"></span> pairs by running the ODE, then <strong>retrain</strong> on these new pairs. The second model learns straighter trajectories because its training pairs are already approximately coupled by the ODE.</p>
+
+      <div class="math-block" data-math="\text{ReFlow: } \quad x_0 \sim p_0, \;\; x_1 = \text{ODE}(x_0), \;\; \text{retrain on } (x_0, x_1)"></div>
+
+      <p>Each iteration of "rectification" produces straighter paths. After 2-3 rounds, you can often use Euler with just 1-2 steps!</p>
+
+      <h3>9.2 Consistency Distillation</h3>
+
+      <p><strong>Consistency models</strong> (Song et al., 2023) train a model to map any point on the ODE trajectory directly to the endpoint, bypassing the ODE entirely. The consistency property requires: <span class="inline-math" data-math="f_\theta(x_t, t) = f_\theta(x_{t'}, t')"></span> for any <span class="inline-math" data-math="t, t'"></span> on the same trajectory.</p>
+
+      <h3>9.3 Progressive Distillation</h3>
+
+      <p><strong>Progressive distillation</strong> (Salimans & Ho, 2022) iteratively halves the number of steps. Starting from a teacher that uses <span class="inline-math" data-math="N"></span> steps, train a student to match the teacher's 2-step output in a single step. Then repeat, using the student as the new teacher. After <span class="inline-math" data-math="k"></span> rounds: <span class="inline-math" data-math="N \to N/2 \to N/4 \to \cdots \to N/2^k"></span> steps.</p>
+
+      <h3>9.4 Shortcut Models</h3>
+
+      <p>The most recent approach — <strong>Shortcut Models</strong> (Frans et al., 2024) — conditions the velocity network on the desired step size <span class="inline-math" data-math="d"></span>: <span class="inline-math" data-math="v_\theta(x, t, d)"></span>. At <span class="inline-math" data-math="d \to 0"></span>, it recovers the standard velocity field. At large <span class="inline-math" data-math="d"></span>, it learns to "shortcut" multiple ODE steps into one. This allows variable step counts at inference time without retraining.</p>
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           13. INTERACTIVE DEMO — STEP COUNT vs QUALITY
+           ════════════════════════════════════════════════════════════════════ -->
+      <div class="interactive-section" id="demo-steps">
+        <h4>Interactive Demo: Effect of Step Count on Sample Quality</h4>
+        <p class="subtitle">See how the number of sampling steps affects the final particle distribution. With fewer steps, particles don't reach their targets accurately. Watch the distribution sharpen as you increase steps.</p>
+        <div class="canvas-container" id="stepsCanvas" style="height: 450px;"></div>
+        <div class="controls">
+          <label>Steps:</label>
+          <input type="range" id="stepsSlider" min="1" max="50" step="1" value="3">
+          <span class="value-display" id="stepsDisplay">N = 3</span>
+          <label style="margin-left: 1rem;">Sampler:</label>
+          <select id="samplerSelect" style="background: var(--bg-glass); color: var(--text-primary); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 0.4rem 0.8rem; font-family: var(--font-heading); font-size: 0.85rem; cursor: pointer;">
+            <option value="euler">Euler</option>
+            <option value="midpoint">Midpoint</option>
+            <option value="heun">Heun</option>
+            <option value="rk4" selected>RK4</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           14. PRACTICAL GUIDE
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="practical">10. Practical Guide — Which Sampler to Use?</h2>
+
+      <p>Here's a decision framework for choosing your sampler:</p>
+
+      <h3>10.1 Quick Recommendations</h3>
+
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Scenario</th>
+            <th>Recommended Sampler</th>
+            <th>Steps</th>
+            <th>Why</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Real-time / Interactive</td>
+            <td><strong>Euler</strong></td>
+            <td>5-10</td>
+            <td>Minimum NFE, works well with straight OT paths</td>
+          </tr>
+          <tr>
+            <td>Production (quality matters)</td>
+            <td><strong>Heun</strong></td>
+            <td>10-25</td>
+            <td>Best quality-per-NFE for most models</td>
+          </tr>
+          <tr>
+            <td>Research / Evaluation</td>
+            <td><strong>dopri5</strong> (adaptive)</td>
+            <td>Auto</td>
+            <td>Ground-truth quality, error-controlled</td>
+          </tr>
+          <tr>
+            <td>Maximum quality</td>
+            <td><strong>RK4</strong></td>
+            <td>50-100</td>
+            <td>Near-exact ODE solution</td>
+          </tr>
+          <tr>
+            <td>Ultra-fast (1-4 steps)</td>
+            <td><strong>Euler + ReFlow</strong></td>
+            <td>1-4</td>
+            <td>Requires distillation/rectification</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>10.2 Time Schedule Matters</h3>
+
+      <p>Beyond the solver itself, the <strong>time schedule</strong> — where you place your discrete time steps — has a huge impact. Common choices:</p>
+
+      <ul>
+        <li><strong>Uniform:</strong> <span class="inline-math" data-math="t_i = i/N"></span> — simple, decent default</li>
+        <li><strong>Quadratic:</strong> <span class="inline-math" data-math="t_i = (i/N)^2"></span> — more steps near <span class="inline-math" data-math="t = 0"></span> (noise)</li>
+        <li><strong>Logit-normal:</strong> More steps near <span class="inline-math" data-math="t = 0"></span> and <span class="inline-math" data-math="t = 1"></span> — matches where the velocity field changes most</li>
+        <li><strong>Karras schedule:</strong> <span class="inline-math" data-math="t_i"></span> optimized for specific noise level parameterizations</li>
+        <li><strong>Learned:</strong> Optimize the schedule end-to-end for your specific model</li>
+      </ul>
+
+      <div class="callout insight">
+        <div class="callout-title">Pro Tip</div>
+        <p>For flow matching models trained with the OT path (<span class="inline-math" data-math="x_t = (1-t)x_0 + tx_1"></span>), a <strong>uniform schedule with Heun's method</strong> using 20-30 steps is an excellent default that works well across almost all architectures and datasets.</p>
+      </div>
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           15. CODE
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="code">11. Implementation in PyTorch</h2>
+
+      <p>Let's implement all the samplers we've discussed. Each one takes a trained velocity model and returns generated samples.</p>
+
+      <h3>11.1 Euler Sampler</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span>samplers.py</span>
+          <span>PyTorch</span>
+        </div>
+        <pre><code><span class="token-keyword">@torch.no_grad</span>()
+<span class="token-keyword">def</span> <span class="token-function">euler_sampler</span>(<span class="token-param">model, x, steps=20</span>):
+    <span class="token-string">"""Forward Euler method. NFE = steps."""</span>
+    dt = <span class="token-number">1.0</span> / steps
+    <span class="token-keyword">for</span> i <span class="token-keyword">in</span> <span class="token-function">range</span>(steps):
+        t = torch.full((x.shape[<span class="token-number">0</span>],), i * dt, device=x.device)
+        v = model(x, t)
+        x = x + dt * v
+    <span class="token-keyword">return</span> x</code></pre>
+      </div>
+
+      <h3>11.2 Midpoint Sampler</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span>samplers.py</span>
+          <span>PyTorch</span>
+        </div>
+        <pre><code><span class="token-keyword">@torch.no_grad</span>()
+<span class="token-keyword">def</span> <span class="token-function">midpoint_sampler</span>(<span class="token-param">model, x, steps=20</span>):
+    <span class="token-string">"""Explicit midpoint method. NFE = 2 * steps."""</span>
+    dt = <span class="token-number">1.0</span> / steps
+    <span class="token-keyword">for</span> i <span class="token-keyword">in</span> <span class="token-function">range</span>(steps):
+        t = torch.full((x.shape[<span class="token-number">0</span>],), i * dt, device=x.device)
+        k1 = model(x, t)
+        t_mid = torch.full_like(t, (i + <span class="token-number">0.5</span>) * dt)
+        k2 = model(x + <span class="token-number">0.5</span> * dt * k1, t_mid)
+        x = x + dt * k2
+    <span class="token-keyword">return</span> x</code></pre>
+      </div>
+
+      <h3>11.3 Heun's Sampler</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span>samplers.py</span>
+          <span>PyTorch</span>
+        </div>
+        <pre><code><span class="token-keyword">@torch.no_grad</span>()
+<span class="token-keyword">def</span> <span class="token-function">heun_sampler</span>(<span class="token-param">model, x, steps=20</span>):
+    <span class="token-string">"""Heun's method (improved Euler). NFE = 2 * steps."""</span>
+    dt = <span class="token-number">1.0</span> / steps
+    <span class="token-keyword">for</span> i <span class="token-keyword">in</span> <span class="token-function">range</span>(steps):
+        t_n = torch.full((x.shape[<span class="token-number">0</span>],), i * dt, device=x.device)
+        t_next = torch.full_like(t_n, (i + <span class="token-number">1</span>) * dt)
+        k1 = model(x, t_n)
+        x_pred = x + dt * k1
+        k2 = model(x_pred, t_next)
+        x = x + <span class="token-number">0.5</span> * dt * (k1 + k2)
+    <span class="token-keyword">return</span> x</code></pre>
+      </div>
+
+      <h3>11.4 RK4 Sampler</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span>samplers.py</span>
+          <span>PyTorch</span>
+        </div>
+        <pre><code><span class="token-keyword">@torch.no_grad</span>()
+<span class="token-keyword">def</span> <span class="token-function">rk4_sampler</span>(<span class="token-param">model, x, steps=20</span>):
+    <span class="token-string">"""Classic 4th-order Runge-Kutta. NFE = 4 * steps."""</span>
+    dt = <span class="token-number">1.0</span> / steps
+    <span class="token-keyword">for</span> i <span class="token-keyword">in</span> <span class="token-function">range</span>(steps):
+        t = i * dt
+        t_tensor = torch.full((x.shape[<span class="token-number">0</span>],), t, device=x.device)
+        t_mid = torch.full_like(t_tensor, t + <span class="token-number">0.5</span> * dt)
+        t_end = torch.full_like(t_tensor, t + dt)
+
+        k1 = model(x, t_tensor)
+        k2 = model(x + <span class="token-number">0.5</span> * dt * k1, t_mid)
+        k3 = model(x + <span class="token-number">0.5</span> * dt * k2, t_mid)
+        k4 = model(x + dt * k3, t_end)
+
+        x = x + (dt / <span class="token-number">6</span>) * (k1 + <span class="token-number">2</span>*k2 + <span class="token-number">2</span>*k3 + k4)
+    <span class="token-keyword">return</span> x</code></pre>
+      </div>
+
+      <h3>11.5 Unified Sampler with Schedule</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span>samplers.py</span>
+          <span>PyTorch</span>
+        </div>
+        <pre><code><span class="token-keyword">def</span> <span class="token-function">get_schedule</span>(<span class="token-param">steps, schedule=<span class="token-string">"uniform"</span></span>):
+    <span class="token-string">"""Generate time schedule for sampling."""</span>
+    <span class="token-keyword">if</span> schedule == <span class="token-string">"uniform"</span>:
+        <span class="token-keyword">return</span> torch.linspace(<span class="token-number">0</span>, <span class="token-number">1</span>, steps + <span class="token-number">1</span>)
+    <span class="token-keyword">elif</span> schedule == <span class="token-string">"quadratic"</span>:
+        <span class="token-keyword">return</span> torch.linspace(<span class="token-number">0</span>, <span class="token-number">1</span>, steps + <span class="token-number">1</span>) ** <span class="token-number">2</span>
+    <span class="token-keyword">elif</span> schedule == <span class="token-string">"cosine"</span>:
+        <span class="token-keyword">return</span> <span class="token-number">0.5</span> * (<span class="token-number">1</span> - torch.cos(
+            torch.linspace(<span class="token-number">0</span>, torch.pi, steps + <span class="token-number">1</span>)))
+    <span class="token-keyword">raise</span> ValueError(f<span class="token-string">"Unknown schedule: {schedule}"</span>)
+
+<span class="token-keyword">@torch.no_grad</span>()
+<span class="token-keyword">def</span> <span class="token-function">sample</span>(<span class="token-param">model, x, steps=<span class="token-number">20</span>, method=<span class="token-string">"heun"</span>, schedule=<span class="token-string">"uniform"</span></span>):
+    <span class="token-string">"""Unified sampler with configurable method and schedule."""</span>
+    ts = get_schedule(steps, schedule).to(x.device)
+    samplers = {<span class="token-string">"euler"</span>: _euler, <span class="token-string">"midpoint"</span>: _midpoint,
+                <span class="token-string">"heun"</span>: _heun, <span class="token-string">"rk4"</span>: _rk4}
+    step_fn = samplers[method]
+
+    <span class="token-keyword">for</span> i <span class="token-keyword">in</span> <span class="token-function">range</span>(steps):
+        x = step_fn(model, x, ts[i], ts[i+<span class="token-number">1</span>] - ts[i])
+    <span class="token-keyword">return</span> x</code></pre>
+      </div>
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           CONCLUSION
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2>12. Conclusion</h2>
+
+      <p>The choice of sampler is not an afterthought — it's a critical design decision that can make or break your flow matching model's performance in production. Here's the big picture:</p>
+
+      <ul>
+        <li><strong>Euler</strong> is the workhorse — simple, fast, and surprisingly effective for straight OT paths</li>
+        <li><strong>Heun's method</strong> offers the best bang for your buck in most practical scenarios</li>
+        <li><strong>RK4</strong> gives near-exact solutions when you can afford 4x the NFE</li>
+        <li><strong>Adaptive methods</strong> are ideal for research but tricky for batched GPU inference</li>
+        <li><strong>Stochastic samplers</strong> can help when deterministic solvers accumulate too much error</li>
+        <li><strong>Distillation/ReFlow</strong> breaks through the solver barrier entirely, enabling 1-4 step generation</li>
+      </ul>
+
+      <p>The trajectory from noise to data is a journey, and the sampler is your vehicle. Choose wisely — and remember that the best sampler depends on your specific velocity field, your compute budget, and your quality requirements.</p>
+
+      <div class="callout key">
+        <div class="callout-title">Key Takeaway</div>
+        <p>Flow matching's greatest advantage is its <strong>straight trajectories</strong>. Unlike diffusion models with curved paths, OT-CFM learns nearly linear flows — meaning simpler samplers work better and you need fewer steps. This is why flow matching has become the backbone of models like Stable Diffusion 3 and modern video generators.</p>
+      </div>
+
+      <h3>References</h3>
+
+      <div class="callout key">
+        <div class="callout-title">Essential Papers</div>
+        <p>
+          <strong>1.</strong> Lipman et al. — <em>"Flow Matching for Generative Modeling"</em> (ICLR 2023)<br>
+          <strong>2.</strong> Liu et al. — <em>"Flow Straight and Fast: Rectified Flow"</em> (ICLR 2023)<br>
+          <strong>3.</strong> Karras et al. — <em>"Elucidating the Design Space of Diffusion-Based Generative Models"</em> (NeurIPS 2022)<br>
+          <strong>4.</strong> Song et al. — <em>"Consistency Models"</em> (ICML 2023)<br>
+          <strong>5.</strong> Salimans & Ho — <em>"Progressive Distillation for Fast Sampling"</em> (ICLR 2022)<br>
+          <strong>6.</strong> Dormand & Prince — <em>"A family of embedded RK formulae"</em> (J. Comp. Appl. Math. 1980)<br>
+          <strong>7.</strong> Frans et al. — <em>"One Step Diffusion via Shortcut Models"</em> (2024)
+        </p>
+      </div>
+
+      <div style="text-align: center; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-subtle);">
+        <p style="color: var(--text-muted); font-size: 0.9rem;">Part of the Flow Matching series. More deep dives coming soon.</p>
+        <div class="btn-group">
+          <a href="flow-matching.html" class="btn btn-secondary">← Flow Matching Guide</a>
+          <a href="index.html" class="btn btn-secondary">Home →</a>
+        </div>
+      </div>
+
+    </div>
+  </article>
+
+  <div class="glow-orb cyan" style="width:400px;height:400px;top:5%;right:-8%;"></div>
+  <div class="glow-orb purple" style="width:500px;height:500px;top:40%;left:-10%;"></div>
+  <div class="glow-orb pink" style="width:350px;height:350px;bottom:15%;right:-5%;"></div>
+
+  <footer class="footer">
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="flow-matching.html">Flow Matching</a>
+      <a href="samplers-flow-matching.html">Samplers</a>
+      <a href="brain.html">Brain</a>
+      <a href="universe.html">Universe</a>
+    </div>
+    <p>&copy; 2026 Deep Blog. Built with curiosity and caffeine.</p>
+  </footer>
+
+  <!-- Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+
+  <!-- Render KaTeX math -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.math-block[data-math]').forEach(el => {
+        katex.render(el.dataset.math, el, { displayMode: true, throwOnError: false });
+      });
+      document.querySelectorAll('.inline-math[data-math]').forEach(el => {
+        katex.render(el.dataset.math, el, { displayMode: false, throwOnError: false });
+      });
+    });
+  </script>
+
+  <script src="js/main.js"></script>
+  <script src="js/samplers.js"></script>
+</body>
+</html>

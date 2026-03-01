@@ -38,7 +38,13 @@
     <ul class="nav-links" id="navLinks">
       <li><a href="index.html">Home</a></li>
       <li><a href="about.html">About</a></li>
-      <li><a href="flow-matching.html" class="active">Deep Learning</a></li>
+      <li class="nav-dropdown">
+        <a href="#" class="active">Deep Learning ▾</a>
+        <ul class="dropdown-menu">
+          <li><a href="flow-matching.html" class="active">Flow Matching</a></li>
+          <li><a href="samplers-flow-matching.html">Samplers</a></li>
+        </ul>
+      </li>
       <li><a href="brain.html">Brain</a></li>
       <li><a href="universe.html">Universe</a></li>
     </ul>
@@ -626,8 +632,11 @@
       <p>As generative AI continues to evolve, flow matching is becoming the foundation for the next generation of models — from image generators to protein designers. The river of probability flows ever onward. 🌊</p>
 
       <div style="text-align: center; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-subtle);">
-        <p style="color: var(--text-muted); font-size: 0.9rem;">Found this helpful? More deep dives coming soon.</p>
-        <a href="index.html" class="btn btn-secondary">← Back to Home</a>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">Now that you understand flow matching, learn how to actually generate samples.</p>
+        <div class="btn-group">
+          <a href="index.html" class="btn btn-secondary">← Back to Home</a>
+          <a href="samplers-flow-matching.html" class="btn btn-primary">Next: Samplers for Flow Matching →</a>
+        </div>
       </div>
 
     </div>
@@ -641,7 +650,8 @@
     <div class="footer-links">
       <a href="index.html">Home</a>
       <a href="about.html">About</a>
-      <a href="flow-matching.html">Deep Learning</a>
+      <a href="flow-matching.html">Flow Matching</a>
+      <a href="samplers-flow-matching.html">Samplers</a>
       <a href="brain.html">Brain</a>
       <a href="universe.html">Universe</a>
     </div>
