@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deep Blog — Exploring the Frontiers of Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Scroll Progress -->
+  <div class="scroll-progress" id="scrollProgress"></div>
+
+  <!-- Navigation -->
+  <nav class="navbar" id="navbar">
+    <a href="index.html" class="nav-brand">⟨deep/blog⟩</a>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="flow-matching.html">Deep Learning</a></li>
+      <li><a href="brain.html">Brain</a></li>
+      <li><a href="universe.html">Universe</a></li>
+    </ul>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <canvas class="hero-canvas" id="heroCanvas"></canvas>
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="dot"></span>
+        Exploring Intelligence
+      </div>
+      <h1>Where <span class="gradient-text">Deep Learning</span> Meets the Mysteries of <span class="gradient-text">Mind & Cosmos</span></h1>
+      <p>A deep dive into the mathematics of intelligence — from neural architectures and generative models to the enigma of consciousness and the structure of our universe.</p>
+      <div class="btn-group">
+        <a href="flow-matching.html" class="btn btn-primary">Read Latest Blog →</a>
+        <a href="about.html" class="btn btn-secondary">About Me</a>
+      </div>
+    </div>
+    <div class="hero-overlay"></div>
+  </section>
+
+  <!-- Sections Overview -->
+  <section id="sections">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="overline">Explore</span>
+        <h2>Choose Your <span class="gradient-text">Rabbit Hole</span></h2>
+        <p>Each section is a carefully crafted journey from fundamentals to the cutting edge.</p>
+      </div>
+
+      <div class="cards-grid">
+
+        <!-- Deep Learning Card -->
+        <a href="flow-matching.html" class="card reveal reveal-delay-1">
+          <div class="card-content">
+            <div class="card-icon">🧠</div>
+            <h3>Deep Learning</h3>
+            <p>From the mathematics of neural networks to state-of-the-art generative models. Currently featuring a comprehensive deep dive into Flow Matching.</p>
+            <span class="card-tag new">Latest: Flow Matching</span>
+          </div>
+        </a>
+
+        <!-- Brain & Consciousness Card -->
+        <a href="brain.html" class="card reveal reveal-delay-2">
+          <div class="card-content">
+            <div class="card-icon purple">🔮</div>
+            <h3>Human Brain & Consciousness</h3>
+            <p>Exploring the most complex object in the known universe — the human brain. Neuroscience, consciousness, and the hard problem.</p>
+            <span class="card-tag coming-soon">Coming Soon</span>
+          </div>
+        </a>
+
+        <!-- Universe Card -->
+        <a href="universe.html" class="card reveal reveal-delay-3">
+          <div class="card-content">
+            <div class="card-icon pink">🌌</div>
+            <h3>Know Our Universe</h3>
+            <p>From quantum mechanics to cosmology — understanding the fundamental fabric of reality, spacetime, and our place in the cosmos.</p>
+            <span class="card-tag coming-soon">Coming Soon</span>
+          </div>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Article Preview -->
+  <section id="featured">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="overline">Featured</span>
+        <h2>Flow Matching: <span class="gradient-text">End-to-End Guide</span></h2>
+        <p>The most comprehensive visual guide to flow matching — from probability distributions to state-of-the-art generative modeling.</p>
+      </div>
+
+      <div class="cards-grid">
+        <div class="card reveal reveal-delay-1">
+          <div class="card-content">
+            <div class="card-icon green">📐</div>
+            <h3>Mathematical Foundations</h3>
+            <p>ODEs, vector fields, probability paths, and the continuity equation — built from first principles with interactive visualizations.</p>
+          </div>
+        </div>
+
+        <div class="card reveal reveal-delay-2">
+          <div class="card-content">
+            <div class="card-icon">🎯</div>
+            <h3>3D Interactive Demos</h3>
+            <p>Watch particles flow from noise to data in real-time 3D. Manipulate the velocity field and explore the geometry of generative modeling.</p>
+          </div>
+        </div>
+
+        <div class="card reveal reveal-delay-3">
+          <div class="card-content">
+            <div class="card-icon purple">⚡</div>
+            <h3>From Theory to Practice</h3>
+            <p>Complete training algorithm, PyTorch implementation, connections to diffusion models, and advanced topics like mini-batch OT.</p>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align: center; margin-top: 3rem;" class="reveal">
+        <a href="flow-matching.html" class="btn btn-primary">Read the Full Article →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ambient glow orbs -->
+  <div class="glow-orb cyan" style="width:500px;height:500px;top:10%;right:-10%;"></div>
+  <div class="glow-orb purple" style="width:400px;height:400px;bottom:20%;left:-8%;"></div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="flow-matching.html">Deep Learning</a>
+      <a href="brain.html">Brain</a>
+      <a href="universe.html">Universe</a>
+    </div>
+    <p>&copy; 2026 Deep Blog. Built with curiosity and caffeine.</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

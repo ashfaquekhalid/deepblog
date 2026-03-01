@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flow Matching: A Complete Guide — Deep Blog</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+</head>
+<body>
+
+  <div class="scroll-progress" id="scrollProgress"></div>
+
+  <!-- Table of Contents (left sidebar) -->
+  <div class="toc" id="toc">
+    <a href="#intro" data-label="Introduction" class="active"></a>
+    <a href="#generative" data-label="Generative Models"></a>
+    <a href="#cnf" data-label="Continuous Flows"></a>
+    <a href="#flow-matching" data-label="Flow Matching"></a>
+    <a href="#demo-transport" data-label="Interactive Demo"></a>
+    <a href="#cfm" data-label="Conditional FM"></a>
+    <a href="#ot-paths" data-label="OT Paths"></a>
+    <a href="#demo-velocity" data-label="Velocity Field"></a>
+    <a href="#training" data-label="Training"></a>
+    <a href="#diffusion" data-label="vs Diffusion"></a>
+    <a href="#code" data-label="Code"></a>
+    <a href="#advanced" data-label="Advanced"></a>
+  </div>
+
+  <nav class="navbar" id="navbar">
+    <a href="index.html" class="nav-brand">⟨deep/blog⟩</a>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="flow-matching.html" class="active">Deep Learning</a></li>
+      <li><a href="brain.html">Brain</a></li>
+      <li><a href="universe.html">Universe</a></li>
+    </ul>
+  </nav>
+
+  <!-- Blog Hero -->
+  <section class="blog-hero">
+    <canvas class="hero-canvas" id="blogHeroCanvas"></canvas>
+    <div class="blog-hero-content">
+      <div class="hero-badge">
+        <span class="dot"></span>
+        Deep Learning
+      </div>
+      <h1>Flow Matching:<br><span class="gradient-text">The Complete Guide</span></h1>
+      <p style="color: var(--text-secondary); font-size: 1.15rem; max-width: 650px; margin: 0 auto 1.5rem;">
+        From probability distributions to state-of-the-art generative models — everything you need to understand flow matching, explained visually with interactive 3D animations.
+      </p>
+      <div class="blog-meta">
+        <span>📅 March 2026</span>
+        <span>⏱ 35 min read</span>
+        <span>📊 Beginner → Advanced</span>
+      </div>
+    </div>
+    <div class="hero-overlay"></div>
+  </section>
+
+  <!-- Blog Content -->
+  <article class="blog-article">
+    <div class="container-narrow">
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           1. INTRODUCTION
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="intro">1. Introduction — What Is Flow Matching?</h2>
+
+      <p>Imagine you have a cloud of random noise — points sampled from a simple distribution like a Gaussian. Now imagine you want to <strong>sculpt</strong> that cloud into something meaningful: faces, molecules, music, or any complex data. How do you get from random chaos to structured beauty?</p>
+
+      <p>This is the central question of <strong>generative modeling</strong>, and <strong>Flow Matching</strong> provides one of the most elegant answers. Instead of learning to denoise (like diffusion models) or learning to fool a discriminator (like GANs), flow matching learns a <strong>velocity field</strong> — a set of instructions that tells each particle which direction to move and how fast, smoothly transporting the noise distribution into the data distribution.</p>
+
+      <div class="callout insight">
+        <div class="callout-title">Core Intuition</div>
+        <p>Think of it like a river current. If you drop a leaf (a noise sample) into the river, the current (velocity field) carries it to a specific destination (a data sample). Flow matching learns that current.</p>
+      </div>
+
+      <p>Formally, flow matching constructs a time-dependent velocity field <span class="inline-math" data-math="v_\theta(x, t)"></span> that generates a <strong>probability path</strong> — a continuous transformation of distributions from time <span class="inline-math" data-math="t = 0"></span> (noise) to <span class="inline-math" data-math="t = 1"></span> (data). The velocity field is parameterized by a neural network and trained with a remarkably simple regression loss.</p>
+
+      <p>What makes flow matching special is its combination of <strong>simplicity</strong>, <strong>efficiency</strong>, and <strong>theoretical elegance</strong>. It avoids the complexities of score matching, doesn't require simulating ODEs during training, and naturally connects to optimal transport theory.</p>
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           2. GENERATIVE MODELING LANDSCAPE
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="generative">2. The Generative Modeling Landscape</h2>
+
+      <p>Before diving into flow matching, let's understand where it sits in the broader ecosystem of generative models. Each approach tackles the same fundamental problem — learning to sample from a complex data distribution — but from a different angle.</p>
+
+      <h3>2.1 A Brief History</h3>
+
+      <p><strong>Generative Adversarial Networks (GANs)</strong> pit a generator against a discriminator in a minimax game. The generator tries to create realistic samples, while the discriminator tries to tell real from fake. GANs produce sharp samples but suffer from training instability and mode collapse.</p>
+
+      <p><strong>Variational Autoencoders (VAEs)</strong> learn an encoder-decoder pair with a regularized latent space. They optimize a lower bound on the log-likelihood (ELBO). VAEs are stable to train but often produce blurry samples due to the Gaussian decoder assumption.</p>
+
+      <p><strong>Normalizing Flows</strong> construct invertible transformations between simple and complex distributions. They allow exact likelihood computation but are constrained by the requirement that each transformation be invertible, which limits expressiveness.</p>
+
+      <p><strong>Diffusion Models (Score-Based Models)</strong> learn to reverse a gradual noising process. They achieve stunning sample quality but require many denoising steps during generation and involve complex score matching objectives.</p>
+
+      <p><strong>Flow Matching</strong> takes the best of normalizing flows and diffusion models: it learns a continuous transformation (like flows) with a simple training objective (simpler than diffusion), while achieving state-of-the-art quality.</p>
+
+      <h3>2.2 Comparison at a Glance</h3>
+
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Method</th>
+            <th>Training</th>
+            <th>Sampling</th>
+            <th>Key Challenge</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>GANs</strong></td>
+            <td>Adversarial game</td>
+            <td>Single forward pass</td>
+            <td>Mode collapse, instability</td>
+          </tr>
+          <tr>
+            <td><strong>VAEs</strong></td>
+            <td>ELBO maximization</td>
+            <td>Single forward pass</td>
+            <td>Blurry outputs</td>
+          </tr>
+          <tr>
+            <td><strong>Normalizing Flows</strong></td>
+            <td>Max likelihood</td>
+            <td>Single forward pass</td>
+            <td>Architecture constraints</td>
+          </tr>
+          <tr>
+            <td><strong>Diffusion</strong></td>
+            <td>Score matching</td>
+            <td>Many iterative steps</td>
+            <td>Slow sampling</td>
+          </tr>
+          <tr>
+            <td><strong style="color: var(--accent-cyan);">Flow Matching</strong></td>
+            <td>Simple regression</td>
+            <td>ODE integration</td>
+            <td>Fewest — elegant!</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           3. CONTINUOUS NORMALIZING FLOWS
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="cnf">3. Mathematical Foundation — Continuous Normalizing Flows</h2>
+
+      <p>Flow matching is built on the mathematical framework of <strong>Continuous Normalizing Flows (CNFs)</strong>. Let's build this up step by step.</p>
+
+      <h3>3.1 Ordinary Differential Equations & Flows</h3>
+
+      <p>An <strong>ordinary differential equation (ODE)</strong> describes how a state evolves over time. Given a velocity field <span class="inline-math" data-math="v: \mathbb{R}^d \times [0,1] \to \mathbb{R}^d"></span>, the ODE is:</p>
+
+      <div class="math-block" data-math="\frac{dx_t}{dt} = v(x_t, t), \quad x_0 \sim p_0"></div>
+
+      <p>The solution to this ODE defines a <strong>flow</strong> — a mapping <span class="inline-math" data-math="\phi_t: \mathbb{R}^d \to \mathbb{R}^d"></span> that takes any initial point <span class="inline-math" data-math="x_0"></span> and moves it to its position at time <span class="inline-math" data-math="t"></span>. In other words, <span class="inline-math" data-math="\phi_t(x_0) = x_t"></span>.</p>
+
+      <div class="callout key">
+        <div class="callout-title">Key Concept: Flow</div>
+        <p>A flow is a time-dependent diffeomorphism (smooth, invertible mapping). It tells you where every point in space ends up at time <span class="inline-math" data-math="t"></span>. The velocity field <span class="inline-math" data-math="v(x,t)"></span> is the "recipe" that generates this flow.</p>
+      </div>
+
+      <h3>3.2 How Flows Transform Distributions</h3>
+
+      <p>Here's the crucial insight: a flow doesn't just move individual points — it <strong>transforms entire probability distributions</strong>. If you start with samples from <span class="inline-math" data-math="p_0"></span> and apply the flow <span class="inline-math" data-math="\phi_t"></span>, you get samples from a new distribution <span class="inline-math" data-math="p_t"></span>.</p>
+
+      <p>The relationship between the velocity field and the evolving density is governed by the <strong>continuity equation</strong>:</p>
+
+      <div class="math-block" data-math="\frac{\partial p_t(x)}{\partial t} + \nabla \cdot \big(p_t(x) \, v(x, t)\big) = 0"></div>
+
+      <p>This is a fundamental equation from fluid dynamics. It says that probability is <strong>conserved</strong> — it's not created or destroyed, only moved around by the velocity field. Think of it as the "conservation of probability mass."</p>
+
+      <h3>3.3 The Goal of CNFs</h3>
+
+      <p>A Continuous Normalizing Flow aims to find a velocity field <span class="inline-math" data-math="v_\theta"></span> such that:</p>
+      <ul>
+        <li>At time <span class="inline-math" data-math="t = 0"></span>, the distribution is a simple prior: <span class="inline-math" data-math="p_0 = \mathcal{N}(0, I)"></span></li>
+        <li>At time <span class="inline-math" data-math="t = 1"></span>, the distribution matches the data: <span class="inline-math" data-math="p_1 \approx p_{\text{data}}"></span></li>
+      </ul>
+
+      <p>The classic approach to training CNFs uses maximum likelihood via the <strong>instantaneous change of variables formula</strong>:</p>
+
+      <div class="math-block" data-math="\log p_1(x_1) = \log p_0(x_0) - \int_0^1 \nabla \cdot v_\theta(x_t, t) \, dt"></div>
+
+      <p>But computing this requires simulating the ODE forward <em>and</em> computing the divergence at every step, which is computationally expensive. This is the key limitation that flow matching overcomes.</p>
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           4. FLOW MATCHING
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="flow-matching">4. Flow Matching — The Breakthrough</h2>
+
+      <p>Now we arrive at the main event. Flow matching, introduced by Lipman et al. (2022) and independently by Liu et al. (2022) and Albergo & Vanden-Eijnden (2022), provides a <strong>simulation-free</strong> training objective for continuous normalizing flows.</p>
+
+      <h3>4.1 The Key Insight</h3>
+
+      <p>Instead of training via maximum likelihood (which requires ODE simulation), flow matching directly <strong>regresses the velocity field</strong> against a target velocity field that generates the desired probability path.</p>
+
+      <p>Suppose we know a target velocity field <span class="inline-math" data-math="u(x, t)"></span> that generates a probability path <span class="inline-math" data-math="p_t"></span> going from <span class="inline-math" data-math="p_0"></span> to <span class="inline-math" data-math="p_1 = p_{\text{data}}"></span>. Then we can train our neural network <span class="inline-math" data-math="v_\theta"></span> by minimizing:</p>
+
+      <div class="math-block" data-math="\mathcal{L}_{\text{FM}}(\theta) = \mathbb{E}_{t \sim \mathcal{U}[0,1], \, x \sim p_t} \| v_\theta(x, t) - u(x, t) \|^2"></div>
+
+      <div class="callout warning">
+        <div class="callout-title">The Problem</div>
+        <p>This "Flow Matching" objective looks beautiful, but there's a catch: we don't know <span class="inline-math" data-math="u(x, t)"></span> or <span class="inline-math" data-math="p_t"></span> in closed form! Computing the marginal velocity field requires integrating over all possible data points, which is intractable.</p>
+      </div>
+
+      <h3>4.2 Why Not Use It Directly?</h3>
+
+      <p>The marginal velocity field <span class="inline-math" data-math="u(x,t)"></span> that generates <span class="inline-math" data-math="p_t"></span> is defined as:</p>
+
+      <div class="math-block" data-math="u(x, t) = \frac{\int u(x | x_1, t) \, p_t(x | x_1) \, p_{\text{data}}(x_1) \, dx_1}{\int p_t(x | x_1) \, p_{\text{data}}(x_1) \, dx_1}"></div>
+
+      <p>This integral over the entire data distribution is intractable. We need a trick — and that trick is <strong>Conditional Flow Matching</strong>.</p>
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           5. INTERACTIVE DEMO — DISTRIBUTION TRANSPORT
+           ════════════════════════════════════════════════════════════════════ -->
+      <div class="interactive-section" id="demo-transport">
+        <h4>Interactive Demo: Distribution Transport</h4>
+        <p class="subtitle">Watch particles flow from Gaussian noise to structured data. Drag to rotate, scroll to zoom, use the slider to control time.</p>
+        <div class="canvas-container" id="transportCanvas"></div>
+        <div class="controls">
+          <label>Time t:</label>
+          <input type="range" id="timeSlider" min="0" max="1" step="0.005" value="0">
+          <span class="value-display" id="timeDisplay">t = 0.00</span>
+          <button id="playBtn">▶ Play</button>
+          <button id="resetBtn">↺ Reset</button>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           6. CONDITIONAL FLOW MATCHING
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="cfm">5. Conditional Flow Matching — The Tractable Solution</h2>
+
+      <p>The breakthrough that makes flow matching practical is the realization that we can work with <strong>conditional</strong> probability paths and velocity fields, conditioned on individual data points.</p>
+
+      <h3>5.1 Conditional Probability Paths</h3>
+
+      <p>For each data point <span class="inline-math" data-math="x_1 \sim p_{\text{data}}"></span>, we define a <strong>conditional probability path</strong> <span class="inline-math" data-math="p_t(x | x_1)"></span> that goes from the prior to a distribution concentrated around <span class="inline-math" data-math="x_1"></span>:</p>
+
+      <ul>
+        <li>At <span class="inline-math" data-math="t = 0"></span>: <span class="inline-math" data-math="p_0(x | x_1) = \mathcal{N}(0, I)"></span> (independent of <span class="inline-math" data-math="x_1"></span>)</li>
+        <li>At <span class="inline-math" data-math="t = 1"></span>: <span class="inline-math" data-math="p_1(x | x_1) \approx \delta(x - x_1)"></span> (concentrated at <span class="inline-math" data-math="x_1"></span>)</li>
+      </ul>
+
+      <p>The simplest and most powerful choice is the <strong>Gaussian probability path</strong>:</p>
+
+      <div class="math-block" data-math="p_t(x | x_1) = \mathcal{N}\big(x \,\big|\, t \cdot x_1, \, (1 - (1-\sigma_{\min})t)^2 I\big)"></div>
+
+      <p>where <span class="inline-math" data-math="\sigma_{\min}"></span> is a small constant (often set to <span class="inline-math" data-math="10^{-5}"></span>). This means the conditional sample at time <span class="inline-math" data-math="t"></span> is:</p>
+
+      <div class="math-block" data-math="x_t = t \cdot x_1 + (1 - (1-\sigma_{\min})t) \cdot x_0, \quad x_0 \sim \mathcal{N}(0, I)"></div>
+
+      <h3>5.2 The Conditional Velocity Field</h3>
+
+      <p>Each conditional probability path has a corresponding <strong>conditional velocity field</strong> <span class="inline-math" data-math="u(x | x_1, t)"></span> that generates it. For the Gaussian path above, this velocity is:</p>
+
+      <div class="math-block" data-math="u(x | x_1, t) = \frac{x_1 - (1 - \sigma_{\min}) x}{1 - (1 - \sigma_{\min})t}"></div>
+
+      <p>In the simplified case where <span class="inline-math" data-math="\sigma_{\min} \to 0"></span>, this becomes beautifully simple:</p>
+
+      <div class="math-block" data-math="u(x | x_1, t) = \frac{x_1 - x}{1 - t}"></div>
+
+      <h3>5.3 The Conditional Flow Matching Loss</h3>
+
+      <p>Here comes the magic. Lipman et al. proved that the <strong>Conditional Flow Matching (CFM)</strong> loss has the <strong>same gradients</strong> as the intractable Flow Matching loss:</p>
+
+      <div class="math-block" data-math="\mathcal{L}_{\text{CFM}}(\theta) = \mathbb{E}_{t, \, x_1 \sim p_{\text{data}}, \, x_0 \sim p_0} \big\| v_\theta(x_t, t) - u(x_t | x_1, t) \big\|^2"></div>
+
+      <div class="callout insight">
+        <div class="callout-title">Why This Is Remarkable</div>
+        <p>The CFM loss is <strong>tractable</strong> — we can sample <span class="inline-math" data-math="t"></span>, <span class="inline-math" data-math="x_0"></span>, <span class="inline-math" data-math="x_1"></span>, construct <span class="inline-math" data-math="x_t"></span>, compute <span class="inline-math" data-math="u(x_t|x_1,t)"></span>, and evaluate the loss. No ODE simulation needed! Yet minimizing this objective is equivalent to minimizing the original FM loss. This is proven via the law of total expectation.</p>
+      </div>
+
+      <h3>5.4 The Optimal Transport Path (Simplest Case)</h3>
+
+      <p>The simplest and most commonly used conditional path is the <strong>linear interpolation</strong> (which corresponds to the optimal transport displacement interpolant):</p>
+
+      <div class="math-block" data-math="x_t = (1 - t) \, x_0 + t \, x_1"></div>
+
+      <p>With this path, the conditional velocity field is simply:</p>
+
+      <div class="math-block" data-math="u(x_t | x_1, t) = x_1 - x_0"></div>
+
+      <p>That's it. The target velocity is just the difference between the data point and the noise sample — a constant vector pointing from start to end. The training objective becomes:</p>
+
+      <div class="math-block" data-math="\mathcal{L}_{\text{OT-CFM}}(\theta) = \mathbb{E}_{t, \, x_0, \, x_1} \big\| v_\theta\big((1-t)x_0 + t \, x_1, \, t\big) - (x_1 - x_0) \big\|^2"></div>
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           7. OPTIMAL TRANSPORT PATHS
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="ot-paths">6. Why Straight Paths? — Optimal Transport Connection</h2>
+
+      <p>You might wonder: why use straight-line interpolation between <span class="inline-math" data-math="x_0"></span> and <span class="inline-math" data-math="x_1"></span>? The answer comes from <strong>optimal transport (OT)</strong> theory.</p>
+
+      <h3>6.1 The Transport Problem</h3>
+
+      <p>Optimal transport asks: what is the most efficient way to move mass from one distribution to another? The "cost" is typically the total distance traveled. The <strong>Wasserstein-2 distance</strong> measures this optimal cost:</p>
+
+      <div class="math-block" data-math="W_2(p_0, p_1)^2 = \inf_{\pi \in \Pi(p_0, p_1)} \int \|x_0 - x_1\|^2 \, d\pi(x_0, x_1)"></div>
+
+      <h3>6.2 McCann's Displacement Interpolation</h3>
+
+      <p>McCann (1997) showed that the optimal way to interpolate between distributions is via <strong>displacement interpolation</strong>:</p>
+
+      <div class="math-block" data-math="x_t = (1-t)\,x_0 + t\, T(x_0)"></div>
+
+      <p>where <span class="inline-math" data-math="T"></span> is the optimal transport map. Each particle travels in a <strong>straight line</strong> from its starting point to its optimal destination. This is exactly the path used in flow matching!</p>
+
+      <div class="callout key">
+        <div class="callout-title">OT ↔ Flow Matching Connection</div>
+        <p>The linear interpolation path in flow matching corresponds to the <strong>optimal transport geodesic</strong> in Wasserstein space. This isn't a coincidence — it's why OT-CFM produces straighter trajectories, faster convergence, and can generate samples with fewer ODE steps.</p>
+      </div>
+
+      <h3>6.3 Why Straight Paths Are Better</h3>
+
+      <p>Compared to the curved paths in diffusion models (which go through very noisy intermediate states), straight OT paths have several advantages:</p>
+      <ul>
+        <li><strong>Straighter trajectories</strong> → fewer ODE solver steps needed at inference</li>
+        <li><strong>Lower transport cost</strong> → more efficient training</li>
+        <li><strong>Better conditioning</strong> → more stable gradients</li>
+        <li><strong>Simpler velocity field</strong> → easier for the neural network to learn</li>
+      </ul>
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           8. INTERACTIVE DEMO — VELOCITY FIELD
+           ════════════════════════════════════════════════════════════════════ -->
+      <div class="interactive-section" id="demo-velocity">
+        <h4>Interactive Demo: 3D Velocity Field</h4>
+        <p class="subtitle">Explore the velocity field that transports the distribution. Arrows show direction and magnitude. Drag to rotate, slider to change time.</p>
+        <div class="canvas-container" id="velocityCanvas"></div>
+        <div class="controls">
+          <label>Time t:</label>
+          <input type="range" id="velTimeSlider" min="0" max="1" step="0.01" value="0.3">
+          <span class="value-display" id="velTimeDisplay">t = 0.30</span>
+          <button id="toggleArrows">Show Field</button>
+          <button id="togglePaths">Show Paths</button>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           9. TRAINING ALGORITHM
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="training">7. Training Algorithm — Step by Step</h2>
+
+      <p>The complete training algorithm for flow matching is beautifully simple. Here it is, step by step:</p>
+
+      <div class="steps">
+        <div class="step">
+          <p><strong>Sample time:</strong> Draw <span class="inline-math" data-math="t \sim \mathcal{U}[0, 1]"></span> uniformly at random.</p>
+        </div>
+        <div class="step">
+          <p><strong>Sample data:</strong> Draw a data point <span class="inline-math" data-math="x_1 \sim p_{\text{data}}"></span> from your training set.</p>
+        </div>
+        <div class="step">
+          <p><strong>Sample noise:</strong> Draw noise <span class="inline-math" data-math="x_0 \sim \mathcal{N}(0, I)"></span> from the prior.</p>
+        </div>
+        <div class="step">
+          <p><strong>Interpolate:</strong> Construct the noisy sample <span class="inline-math" data-math="x_t = (1-t)\,x_0 + t\,x_1"></span>.</p>
+        </div>
+        <div class="step">
+          <p><strong>Compute target:</strong> The target velocity is <span class="inline-math" data-math="u_t = x_1 - x_0"></span>.</p>
+        </div>
+        <div class="step">
+          <p><strong>Predict:</strong> Forward pass through the network: <span class="inline-math" data-math="v_\theta(x_t, t)"></span>.</p>
+        </div>
+        <div class="step">
+          <p><strong>Loss:</strong> Compute <span class="inline-math" data-math="\mathcal{L} = \|v_\theta(x_t, t) - u_t\|^2"></span> and backpropagate.</p>
+        </div>
+      </div>
+
+      <h3>7.1 Sampling (Inference)</h3>
+
+      <p>Once trained, generating a new sample is done by solving the ODE forward in time:</p>
+
+      <div class="steps">
+        <div class="step">
+          <p>Sample initial noise: <span class="inline-math" data-math="x_0 \sim \mathcal{N}(0, I)"></span></p>
+        </div>
+        <div class="step">
+          <p>Solve the ODE: <span class="inline-math" data-math="\frac{dx_t}{dt} = v_\theta(x_t, t)"></span> from <span class="inline-math" data-math="t=0"></span> to <span class="inline-math" data-math="t=1"></span></p>
+        </div>
+        <div class="step">
+          <p>Use an ODE solver (Euler, RK4, or adaptive) with <span class="inline-math" data-math="N"></span> discretization steps</p>
+        </div>
+        <div class="step">
+          <p>Return <span class="inline-math" data-math="x_1"></span> as the generated sample</p>
+        </div>
+      </div>
+
+      <p>With Euler's method, the update rule at each step is simply:</p>
+
+      <div class="math-block" data-math="x_{t + \Delta t} = x_t + \Delta t \cdot v_\theta(x_t, t)"></div>
+
+      <p>Because OT-CFM produces nearly straight trajectories, you can get good results with surprisingly few steps (often 10-50, compared to hundreds for diffusion).</p>
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           10. CONNECTION TO DIFFUSION
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="diffusion">8. Connection to Diffusion Models</h2>
+
+      <p>Flow matching and diffusion models are deeply connected — in fact, diffusion models are a <strong>special case</strong> of the flow matching framework!</p>
+
+      <h3>8.1 Diffusion as a Specific Probability Path</h3>
+
+      <p>In a diffusion model (e.g., DDPM), the forward process adds noise according to:</p>
+
+      <div class="math-block" data-math="x_t = \alpha_t \, x_1 + \sigma_t \, \epsilon, \quad \epsilon \sim \mathcal{N}(0, I)"></div>
+
+      <p>where <span class="inline-math" data-math="\alpha_t"></span> and <span class="inline-math" data-math="\sigma_t"></span> follow a specific noise schedule. This defines a probability path <span class="inline-math" data-math="p_t(x|x_1) = \mathcal{N}(\alpha_t x_1, \sigma_t^2 I)"></span>.</p>
+
+      <p>This is just a <strong>particular choice of conditional probability path</strong> in the flow matching framework! The Variance Preserving (VP) and Variance Exploding (VE) schedules from score-based models correspond to specific path families.</p>
+
+      <h3>8.2 The Unifying View</h3>
+
+      <p>Flow matching provides a <strong>unified framework</strong> where:</p>
+
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Choice of Path</th>
+            <th>Recovers</th>
+            <th>Path Shape</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Linear: <span class="inline-math" data-math="x_t = (1-t)x_0 + tx_1"></span></td>
+            <td><strong>OT-CFM (Flow Matching)</strong></td>
+            <td>Straight lines</td>
+          </tr>
+          <tr>
+            <td>VP schedule: <span class="inline-math" data-math="\alpha_t, \sigma_t"></span></td>
+            <td><strong>DDPM / Score SDE</strong></td>
+            <td>Curved paths</td>
+          </tr>
+          <tr>
+            <td>VE schedule</td>
+            <td><strong>SMLD / NCSN</strong></td>
+            <td>Curved paths</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout insight">
+        <div class="callout-title">Flow Matching Generalizes Diffusion</div>
+        <p>Every diffusion model can be reformulated as a flow matching model with a specific choice of probability path. But flow matching also allows <strong>new paths</strong> (like the OT path) that diffusion models don't naturally express — and these new paths often perform better!</p>
+      </div>
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           11. CODE IMPLEMENTATION
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="code">9. Implementation in PyTorch</h2>
+
+      <p>Let's implement the complete OT-CFM training loop. The code is remarkably concise.</p>
+
+      <h3>9.1 Training Loop</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span>flow_matching_train.py</span>
+          <span>PyTorch</span>
+        </div>
+        <pre><code><span class="token-keyword">import</span> <span class="token-class">torch</span>
+<span class="token-keyword">import</span> <span class="token-class">torch.nn</span> <span class="token-keyword">as</span> <span class="token-variable">nn</span>
+
+<span class="token-keyword">class</span> <span class="token-class">FlowMatchingTrainer</span>:
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(<span class="token-param">self, model, optimizer, sigma_min=1e-5</span>):
+        <span class="token-variable">self</span>.model = model        <span class="token-comment"># v_theta: (x, t) -> velocity</span>
+        <span class="token-variable">self</span>.optimizer = optimizer
+        <span class="token-variable">self</span>.sigma_min = sigma_min
+
+    <span class="token-keyword">def</span> <span class="token-function">train_step</span>(<span class="token-param">self, x1</span>):
+        <span class="token-string">"""One training step of OT-CFM."""</span>
+        batch_size = x1.shape[<span class="token-number">0</span>]
+
+        <span class="token-comment"># Step 1: Sample time uniformly</span>
+        t = torch.rand(batch_size, <span class="token-number">1</span>, device=x1.device)
+
+        <span class="token-comment"># Step 2: Sample noise from prior</span>
+        x0 = torch.randn_like(x1)
+
+        <span class="token-comment"># Step 3: Construct x_t via linear interpolation</span>
+        x_t = (<span class="token-number">1</span> - t) * x0 + t * x1
+
+        <span class="token-comment"># Step 4: Target velocity (OT path)</span>
+        u_t = x1 - x0
+
+        <span class="token-comment"># Step 5: Predict velocity</span>
+        v_pred = <span class="token-variable">self</span>.model(x_t, t.squeeze())
+
+        <span class="token-comment"># Step 6: MSE Loss</span>
+        loss = nn.functional.mse_loss(v_pred, u_t)
+
+        <span class="token-comment"># Backprop</span>
+        <span class="token-variable">self</span>.optimizer.zero_grad()
+        loss.backward()
+        <span class="token-variable">self</span>.optimizer.step()
+
+        <span class="token-keyword">return</span> loss.item()</code></pre>
+      </div>
+
+      <h3>9.2 Sampling (ODE Solver)</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span>flow_matching_sample.py</span>
+          <span>PyTorch</span>
+        </div>
+        <pre><code><span class="token-keyword">@torch.no_grad</span>()
+<span class="token-keyword">def</span> <span class="token-function">sample</span>(<span class="token-param">model, num_samples, dim, num_steps=100, device=<span class="token-string">"cuda"</span></span>):
+    <span class="token-string">"""Generate samples via Euler ODE integration."""</span>
+    dt = <span class="token-number">1.0</span> / num_steps
+    x = torch.randn(num_samples, dim, device=device)
+
+    <span class="token-keyword">for</span> i <span class="token-keyword">in</span> <span class="token-function">range</span>(num_steps):
+        t = torch.full((num_samples,), i * dt, device=device)
+        v = model(x, t)
+        x = x + v * dt
+
+    <span class="token-keyword">return</span> x</code></pre>
+      </div>
+
+      <h3>9.3 The Velocity Network</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span>velocity_net.py</span>
+          <span>PyTorch</span>
+        </div>
+        <pre><code><span class="token-keyword">class</span> <span class="token-class">VelocityNet</span>(nn.Module):
+    <span class="token-string">"""Simple MLP velocity network with time conditioning."""</span>
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(<span class="token-param">self, dim=2, hidden=256, n_layers=4</span>):
+        <span class="token-keyword">super</span>().__init__()
+        layers = [nn.Linear(dim + <span class="token-number">1</span>, hidden), nn.SiLU()]
+        <span class="token-keyword">for</span> _ <span class="token-keyword">in</span> <span class="token-function">range</span>(n_layers - <span class="token-number">1</span>):
+            layers += [nn.Linear(hidden, hidden), nn.SiLU()]
+        layers += [nn.Linear(hidden, dim)]
+        <span class="token-variable">self</span>.net = nn.Sequential(*layers)
+
+    <span class="token-keyword">def</span> <span class="token-function">forward</span>(<span class="token-param">self, x, t</span>):
+        <span class="token-keyword">if</span> t.dim() == <span class="token-number">0</span>:
+            t = t.unsqueeze(<span class="token-number">0</span>).expand(x.shape[<span class="token-number">0</span>])
+        t = t.unsqueeze(<span class="token-number">-1</span>)
+        <span class="token-keyword">return</span> <span class="token-variable">self</span>.net(torch.cat([x, t], dim=-<span class="token-number">1</span>))</code></pre>
+      </div>
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           12. ADVANCED TOPICS
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="advanced">10. Advanced Topics</h2>
+
+      <h3>10.1 Mini-Batch Optimal Transport</h3>
+
+      <p>In standard OT-CFM, we randomly pair noise samples <span class="inline-math" data-math="x_0"></span> with data samples <span class="inline-math" data-math="x_1"></span>. But this random pairing can lead to crossing trajectories. <strong>Mini-batch OT</strong> (Tong et al., 2023) computes the optimal assignment within each mini-batch:</p>
+
+      <div class="math-block" data-math="\pi^* = \arg\min_{\pi \in \Pi_B} \sum_{i=1}^{B} \|x_0^i - x_1^{\pi(i)}\|^2"></div>
+
+      <p>This reduces trajectory crossing, leads to straighter paths, and improves sample quality — especially with few ODE steps.</p>
+
+      <h3>10.2 Riemannian Flow Matching</h3>
+
+      <p>Real-world data often lives on <strong>manifolds</strong> (e.g., rotations in SO(3), protein structures, geospatial data on a sphere). Riemannian Flow Matching (Chen & Lipman, 2023) extends flow matching to arbitrary Riemannian manifolds by replacing straight-line interpolation with <strong>geodesic interpolation</strong>:</p>
+
+      <div class="math-block" data-math="x_t = \exp_{x_0}\big(t \cdot \log_{x_0}(x_1)\big)"></div>
+
+      <h3>10.3 Stochastic Interpolants</h3>
+
+      <p>Albergo et al. (2023) introduced <strong>stochastic interpolants</strong>, which add noise to the interpolation path:</p>
+
+      <div class="math-block" data-math="x_t = \alpha_t \, x_0 + \beta_t \, x_1 + \sigma_t \, \epsilon"></div>
+
+      <p>This adds stochasticity to the flow, potentially improving coverage and diversity.</p>
+
+      <h3>10.4 Applications</h3>
+
+      <p>Flow matching has been adopted across many domains:</p>
+      <ul>
+        <li><strong>Image Generation:</strong> Stable Diffusion 3 uses a flow matching formulation (Rectified Flows)</li>
+        <li><strong>Video Generation:</strong> Continuous temporal modeling with flow-based approaches</li>
+        <li><strong>Audio/Speech:</strong> Voicebox (Meta) uses flow matching for speech synthesis</li>
+        <li><strong>Protein Design:</strong> FrameFlow uses SE(3) flow matching for protein backbone generation</li>
+        <li><strong>Molecular Generation:</strong> Equivariant flow matching for drug design</li>
+        <li><strong>Text:</strong> Flow matching for discrete sequence generation</li>
+      </ul>
+
+      <h3>10.5 Key References</h3>
+
+      <div class="callout key">
+        <div class="callout-title">Essential Papers</div>
+        <p>
+          <strong>1.</strong> Lipman, Chen, Ben-Hamu, Nickel — <em>"Flow Matching for Generative Modeling"</em> (ICLR 2023)<br>
+          <strong>2.</strong> Liu, Gong, Liu — <em>"Flow Straight and Fast: Learning to Generate and Transfer Data with Rectified Flow"</em> (ICLR 2023)<br>
+          <strong>3.</strong> Albergo, Vanden-Eijnden — <em>"Building Normalizing Flows with Stochastic Interpolants"</em> (ICLR 2023)<br>
+          <strong>4.</strong> Tong et al. — <em>"Improving and Generalizing Flow-Based Generative Models with Minibatch Optimal Transport"</em> (TMLR 2024)<br>
+          <strong>5.</strong> Chen, Lipman — <em>"Riemannian Flow Matching on General Geometries"</em> (ICLR 2024)
+        </p>
+      </div>
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           CONCLUSION
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2>11. Conclusion</h2>
+
+      <p>Flow matching represents a beautiful convergence of ideas from dynamical systems, optimal transport, and deep learning. Its key strengths are:</p>
+
+      <ul>
+        <li><strong>Simplicity:</strong> The training objective is a plain MSE regression — sample, interpolate, predict velocity, done.</li>
+        <li><strong>Efficiency:</strong> No ODE simulation during training, and straight paths mean few steps at inference.</li>
+        <li><strong>Generality:</strong> The framework unifies diffusion models, normalizing flows, and optimal transport.</li>
+        <li><strong>Flexibility:</strong> Easily extended to manifolds, discrete data, and conditional generation.</li>
+      </ul>
+
+      <p>As generative AI continues to evolve, flow matching is becoming the foundation for the next generation of models — from image generators to protein designers. The river of probability flows ever onward. 🌊</p>
+
+      <div style="text-align: center; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-subtle);">
+        <p style="color: var(--text-muted); font-size: 0.9rem;">Found this helpful? More deep dives coming soon.</p>
+        <a href="index.html" class="btn btn-secondary">← Back to Home</a>
+      </div>
+
+    </div>
+  </article>
+
+  <div class="glow-orb cyan" style="width:400px;height:400px;top:5%;right:-8%;"></div>
+  <div class="glow-orb purple" style="width:500px;height:500px;top:40%;left:-10%;"></div>
+  <div class="glow-orb pink" style="width:350px;height:350px;bottom:15%;right:-5%;"></div>
+
+  <footer class="footer">
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="flow-matching.html">Deep Learning</a>
+      <a href="brain.html">Brain</a>
+      <a href="universe.html">Universe</a>
+    </div>
+    <p>&copy; 2026 Deep Blog. Built with curiosity and caffeine.</p>
+  </footer>
+
+  <!-- Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+
+  <!-- Render KaTeX math -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.math-block[data-math]').forEach(el => {
+        katex.render(el.dataset.math, el, { displayMode: true, throwOnError: false });
+      });
+      document.querySelectorAll('.inline-math[data-math]').forEach(el => {
+        katex.render(el.dataset.math, el, { displayMode: false, throwOnError: false });
+      });
+    });
+  </script>
+
+  <script src="js/main.js"></script>
+  <script src="js/flow-matching.js"></script>
+</body>
+</html>
