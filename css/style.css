@@ -1218,6 +1218,7 @@ code:not(pre code) {
 .landing-body {
   padding: 0 0 6rem;
   position: relative;
+  z-index: 5;
 }
 
 /* ── Search Bar ──────────────────────────────────────────────────────────── */
@@ -1302,6 +1303,7 @@ code:not(pre code) {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: 1.5rem;
+  overflow: visible;
 }
 
 .blog-card {
@@ -1335,6 +1337,7 @@ code:not(pre code) {
   box-shadow: 0 12px 40px rgba(0, 212, 255, 0.15), 0 0 60px rgba(0, 212, 255, 0.06);
   color: inherit;
   text-shadow: none;
+  z-index: 10;
 }
 
 .blog-card:hover::before { opacity: 1; }
