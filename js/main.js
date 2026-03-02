@@ -20,6 +20,18 @@
     });
   }
 
+  /* ── Liquid glass ripple on nav link click ─────────────────────────── */
+  document.querySelectorAll(".nav-links a").forEach((link) => {
+    link.addEventListener("click", function () {
+      this.classList.remove("nav-ripple");
+      void this.offsetWidth;
+      this.classList.add("nav-ripple");
+      this.addEventListener("animationend", () => {
+        this.classList.remove("nav-ripple");
+      }, { once: true });
+    });
+  });
+
   window.addEventListener("scroll", () => {
     if (navbar) {
       navbar.classList.toggle("scrolled", window.scrollY > 50);
