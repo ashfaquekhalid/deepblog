@@ -18,9 +18,9 @@
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(50, W / H, 0.1, 300);
-  const CAMERA_BASE = { x: 0, y: 9.6, z: 14.3 };
+  const CAMERA_BASE = { x: 0, y: 9.2, z: 13.9 };
   camera.position.set(CAMERA_BASE.x, CAMERA_BASE.y, CAMERA_BASE.z);
-  camera.lookAt(0, -2.2, 0);
+  camera.lookAt(0, -2.8, 0);
 
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
   renderer.setSize(W, H);
@@ -103,7 +103,7 @@
 
   /* ── Gravity well glow at center ───────────────────────────────────────── */
   const wellGlow = new THREE.Mesh(
-    new THREE.SphereGeometry(1.2, 24, 24),
+    new THREE.SphereGeometry(1.5, 24, 24),
     new THREE.MeshBasicMaterial({
       color: 0x7c3aed,
       transparent: true,
@@ -112,11 +112,11 @@
       depthWrite: false,
     })
   );
-  wellGlow.position.y = -4.7;
+  wellGlow.position.y = -5.4;
   scene.add(wellGlow);
 
   const wellCore = new THREE.Mesh(
-    new THREE.SphereGeometry(0.45, 20, 20),
+    new THREE.SphereGeometry(0.56, 20, 20),
     new THREE.MeshBasicMaterial({
       color: 0xffffff,
       transparent: true,
@@ -125,7 +125,7 @@
       depthWrite: false,
     })
   );
-  wellCore.position.y = -4.7;
+  wellCore.position.y = -5.4;
   scene.add(wellCore);
 
   /* ── Concentric ring lines on the grid surface ─────────────────────────── */
@@ -152,9 +152,11 @@
   }
 
   /* ── Update function ───────────────────────────────────────────────────── */
-  const MASS = 6.6;
-  const WELL_SOFTENING = 1.4;
-  const WELL_FALLOFF = 0.06;
+  const MASS = 7.8;
+  const WELL_SOFTENING = 1.9;
+  const WELL_FALLOFF = 0.048;
+  const BROAD_CURVE_STRENGTH = 1.15;
+  const BROAD_CURVE_RADIUS = 14.5;
 
   // Sparse transient packets mimic merger-like gravitational-wave bursts.
   const packets = [];
@@ -219,9 +221,13 @@
       const theta = Math.atan2(z, x);
 
       // Mostly static potential well; dampened outward for visual stability.
-      const well =
+      const compactWell =
         (-MASS / Math.sqrt(r * r + WELL_SOFTENING)) *
         Math.exp(-r * WELL_FALLOFF);
+      const broadWell =
+        -BROAD_CURVE_STRENGTH *
+        Math.exp(-(r * r) / (BROAD_CURVE_RADIUS * BROAD_CURVE_RADIUS));
+      const well = compactWell + broadWell;
 
       let wave = 0;
       for (let k = 0; k < packets.length; k++) {
@@ -278,7 +284,7 @@
     camera.position.x = CAMERA_BASE.x + Math.sin(t * 0.12) * 1.0 + mouseX * 1.9;
     camera.position.z = CAMERA_BASE.z + Math.sin(t * 0.08) * 0.55;
     camera.position.y = CAMERA_BASE.y + mouseY * -1.05 + Math.sin(t * 0.1) * 0.28;
-    camera.lookAt(0, -2.2, 0);
+    camera.lookAt(0, -2.8, 0);
 
     renderer.render(scene, camera);
   }
