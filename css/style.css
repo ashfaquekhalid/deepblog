@@ -1306,9 +1306,27 @@ code:not(pre code) {
   overflow: visible;
 }
 
-@keyframes glassShimmer {
-  0%   { transform: translateX(-120%) rotate(25deg); }
-  100% { transform: translateX(120%) rotate(25deg); }
+@keyframes glassLiquidDrift {
+  0% {
+    background-position: 0% 0%, 100% 0%, 0% 100%, 100% 100%;
+    transform: translate3d(-10%, -8%, 0) scale(1.06);
+  }
+  25% {
+    background-position: 100% 0%, 100% 100%, 0% 0%, 0% 100%;
+    transform: translate3d(8%, -6%, 0) scale(1.09);
+  }
+  50% {
+    background-position: 100% 100%, 0% 100%, 100% 0%, 0% 0%;
+    transform: translate3d(10%, 8%, 0) scale(1.11);
+  }
+  75% {
+    background-position: 0% 100%, 0% 0%, 100% 100%, 100% 0%;
+    transform: translate3d(-6%, 9%, 0) scale(1.08);
+  }
+  100% {
+    background-position: 0% 0%, 100% 0%, 0% 100%, 100% 100%;
+    transform: translate3d(-10%, -8%, 0) scale(1.06);
+  }
 }
 
 .blog-card {
@@ -1350,41 +1368,43 @@ code:not(pre code) {
   z-index: 0;
 }
 
-/* liquid-glass shimmer band */
+/* liquid-glass flowing highlight */
 .blog-card::after {
   content: '';
   position: absolute;
-  top: -20%;
-  left: -60%;
-  width: 55%;
-  height: 140%;
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.06) 30%,
-    rgba(255, 255, 255, 0.14) 50%,
-    rgba(255, 255, 255, 0.06) 70%,
-    rgba(255, 255, 255, 0) 100%
-  );
-  transform: translateX(-120%) rotate(25deg);
+  inset: -35%;
+  border-radius: 40%;
+  background:
+    radial-gradient(circle at 18% 20%, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0) 42%),
+    radial-gradient(circle at 82% 24%, rgba(0, 212, 255, 0.14) 0%, rgba(0, 212, 255, 0) 44%),
+    radial-gradient(circle at 24% 80%, rgba(124, 58, 237, 0.14) 0%, rgba(124, 58, 237, 0) 45%),
+    radial-gradient(circle at 78% 82%, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0) 40%);
+  background-size: 160% 160%, 170% 170%, 170% 170%, 150% 150%;
+  background-position: 0% 0%, 100% 0%, 0% 100%, 100% 100%;
   pointer-events: none;
   z-index: 1;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  filter: blur(10px) saturate(122%);
+  mix-blend-mode: screen;
+  transition: opacity 0.45s ease;
+  will-change: transform, background-position, opacity;
+  animation: glassLiquidDrift 7s ease-in-out infinite paused;
 }
 
 .blog-card:hover {
-  transform: translateY(-24px) scale(1.25);
-  border-color: rgba(128, 216, 255, 0.28);
+  transform: translateY(-2px) scale(1.2);
+  border-color: rgba(128, 216, 255, 0.22);
   background:
     linear-gradient(135deg,
-      rgba(22, 28, 52, 0.38),
-      rgba(14, 18, 38, 0.22));
+      rgba(22, 28, 52, 0.35),
+      rgba(14, 18, 38, 0.18));
   box-shadow:
-    0 24px 68px rgba(0, 212, 255, 0.12),
-    0 8px 32px rgba(0, 0, 0, 0.30),
-    0 0 0 1px rgba(255, 255, 255, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 24px 68px rgba(0, 212, 255, 0.10),
+    0 8px 32px rgba(0, 0, 0, 0.28),
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    0 0 18px rgba(0, 212, 255, 0.06),
+    0 0 38px rgba(124, 58, 237, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
     inset 0 -1px 0 rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(28px) saturate(130%) brightness(1.04);
   -webkit-backdrop-filter: blur(28px) saturate(130%) brightness(1.04);
@@ -1396,8 +1416,8 @@ code:not(pre code) {
 .blog-card:hover::before { opacity: 1; }
 
 .blog-card:hover::after {
-  opacity: 1;
-  animation: glassShimmer 1.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.1s forwards;
+  opacity: 0.92;
+  animation-play-state: running;
 }
 
 .blog-card:hover .blog-card-icon {
