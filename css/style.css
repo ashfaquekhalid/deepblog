@@ -419,6 +419,7 @@ section {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
   gap: 1.5rem;
+  overflow: visible;
 }
 
 .card {
@@ -427,9 +428,15 @@ section {
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   padding: 2rem;
-  transition: var(--transition-smooth);
+  transition: transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1),
+              background 0.5s ease,
+              border-color 0.5s ease,
+              box-shadow 0.55s cubic-bezier(0.22, 0.61, 0.36, 1),
+              backdrop-filter 0.5s ease;
   overflow: hidden;
   cursor: pointer;
+  transform-origin: center;
+  will-change: transform;
 }
 
 .card::before {
@@ -437,20 +444,79 @@ section {
   position: absolute;
   inset: 0;
   border-radius: var(--radius-lg);
-  background: var(--gradient-card);
+  background:
+    linear-gradient(155deg,
+      rgba(255, 255, 255, 0.10) 0%,
+      rgba(255, 255, 255, 0.02) 35%,
+      rgba(0, 212, 255, 0.05) 65%,
+      rgba(124, 58, 237, 0.04) 100%);
   opacity: 0;
-  transition: var(--transition-smooth);
+  transition: opacity 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+  pointer-events: none;
+  z-index: 0;
 }
 
-.card:hover {
-  transform: translateY(-4px);
-  border-color: rgba(0, 212, 255, 0.2);
-  box-shadow: var(--shadow-glow);
+.card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(circle at 18% 20%, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0) 42%),
+    radial-gradient(circle at 82% 24%, rgba(0, 212, 255, 0.14) 0%, rgba(0, 212, 255, 0) 44%),
+    radial-gradient(circle at 24% 80%, rgba(124, 58, 237, 0.14) 0%, rgba(124, 58, 237, 0) 45%),
+    radial-gradient(circle at 78% 82%, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0) 40%);
+  background-size: 220% 220%, 230% 230%, 230% 230%, 210% 210%;
+  background-position: 0% 0%, 100% 0%, 0% 100%, 100% 100%;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  filter: blur(10px) saturate(122%);
+  mix-blend-mode: screen;
+  transition: opacity 0.45s ease;
+  will-change: background-position, opacity;
+  animation: glassLiquidDrift 7s ease-in-out infinite paused;
+}
+
+.card:hover,
+.reveal.visible.card:hover,
+a.card.reveal.visible:hover {
+  transform: translateY(-24px) scale(1.25);
+  border-color: rgba(128, 216, 255, 0.22);
+  background:
+    linear-gradient(135deg,
+      rgba(22, 28, 52, 0.35),
+      rgba(14, 18, 38, 0.18));
+  box-shadow:
+    0 24px 68px rgba(0, 212, 255, 0.10),
+    0 8px 32px rgba(0, 0, 0, 0.28),
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    0 0 18px rgba(0, 212, 255, 0.06),
+    0 0 38px rgba(124, 58, 237, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(28px) saturate(130%) brightness(1.04);
+  -webkit-backdrop-filter: blur(28px) saturate(130%) brightness(1.04);
 }
 
 .card:hover::before { opacity: 1; }
 
-.card-content { position: relative; z-index: 1; }
+.card:hover::after {
+  opacity: 0.92;
+  animation-play-state: running;
+}
+
+.card:hover .card-icon {
+  transform: scale(1.12);
+  transition: transform 0.3s ease;
+}
+
+.card:hover h3 {
+  color: var(--accent-cyan);
+  transition: color 0.3s ease;
+}
+
+.card-content { position: relative; z-index: 2; }
 
 .card-icon {
   width: 56px;
@@ -1307,26 +1373,11 @@ code:not(pre code) {
 }
 
 @keyframes glassLiquidDrift {
-  0% {
-    background-position: 0% 0%, 100% 0%, 0% 100%, 100% 100%;
-    transform: translate3d(-10%, -8%, 0) scale(1.06);
-  }
-  25% {
-    background-position: 100% 0%, 100% 100%, 0% 0%, 0% 100%;
-    transform: translate3d(8%, -6%, 0) scale(1.09);
-  }
-  50% {
-    background-position: 100% 100%, 0% 100%, 100% 0%, 0% 0%;
-    transform: translate3d(10%, 8%, 0) scale(1.11);
-  }
-  75% {
-    background-position: 0% 100%, 0% 0%, 100% 100%, 100% 0%;
-    transform: translate3d(-6%, 9%, 0) scale(1.08);
-  }
-  100% {
-    background-position: 0% 0%, 100% 0%, 0% 100%, 100% 100%;
-    transform: translate3d(-10%, -8%, 0) scale(1.06);
-  }
+  0%   { background-position: 0% 0%, 100% 0%, 0% 100%, 100% 100%; }
+  25%  { background-position: 100% 0%, 100% 100%, 0% 0%, 0% 100%; }
+  50%  { background-position: 100% 100%, 0% 100%, 100% 0%, 0% 0%; }
+  75%  { background-position: 0% 100%, 0% 0%, 100% 100%, 100% 0%; }
+  100% { background-position: 0% 0%, 100% 0%, 0% 100%, 100% 100%; }
 }
 
 .blog-card {
@@ -1372,14 +1423,14 @@ code:not(pre code) {
 .blog-card::after {
   content: '';
   position: absolute;
-  inset: -35%;
-  border-radius: 40%;
+  inset: 0;
+  border-radius: inherit;
   background:
     radial-gradient(circle at 18% 20%, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0) 42%),
     radial-gradient(circle at 82% 24%, rgba(0, 212, 255, 0.14) 0%, rgba(0, 212, 255, 0) 44%),
     radial-gradient(circle at 24% 80%, rgba(124, 58, 237, 0.14) 0%, rgba(124, 58, 237, 0) 45%),
     radial-gradient(circle at 78% 82%, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0) 40%);
-  background-size: 160% 160%, 170% 170%, 170% 170%, 150% 150%;
+  background-size: 220% 220%, 230% 230%, 230% 230%, 210% 210%;
   background-position: 0% 0%, 100% 0%, 0% 100%, 100% 100%;
   pointer-events: none;
   z-index: 1;
@@ -1387,12 +1438,13 @@ code:not(pre code) {
   filter: blur(10px) saturate(122%);
   mix-blend-mode: screen;
   transition: opacity 0.45s ease;
-  will-change: transform, background-position, opacity;
+  will-change: background-position, opacity;
   animation: glassLiquidDrift 7s ease-in-out infinite paused;
 }
 
-.blog-card:hover {
-  transform: translateY(-2px) scale(1.2);
+.blog-card:hover,
+.reveal.visible.blog-card:hover {
+  transform: translateY(-24px) scale(1.25);
   border-color: rgba(128, 216, 255, 0.22);
   background:
     linear-gradient(135deg,
@@ -1541,11 +1593,11 @@ code:not(pre code) {
   border-color: var(--border-subtle);
 }
 
-.coming-soon-card:hover {
+.coming-soon-card:hover,
+.blog-card.coming-soon-card.reveal.visible:hover {
   border-style: dashed;
-  transform: translateY(-3px) scale(1.01);
-  box-shadow: 0 8px 30px rgba(251, 146, 60, 0.06);
-  cursor: default;
+  transform: translateY(-24px) scale(1.25);
+  cursor: pointer;
 }
 
 .coming-soon-label {
