@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How Neurons Compute — Deep Blog</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+</head>
+<body>
+
+  <div class="scroll-progress" id="scrollProgress"></div>
+
+  <!-- Table of Contents (left sidebar) -->
+  <div class="toc" id="toc">
+    <a href="#intro" data-label="Introduction" class="active"></a>
+    <a href="#anatomy" data-label="Neuron Anatomy"></a>
+    <a href="#resting" data-label="Resting Potential"></a>
+    <a href="#action-potential" data-label="Action Potential"></a>
+    <a href="#demo-ap" data-label="AP Simulator"></a>
+    <a href="#synapses" data-label="Synaptic Transmission"></a>
+    <a href="#integration" data-label="Neural Integration"></a>
+    <a href="#demo-integration" data-label="Integration Demo"></a>
+    <a href="#coding" data-label="Neural Coding"></a>
+    <a href="#demo-spikes" data-label="Spike Train Demo"></a>
+    <a href="#plasticity" data-label="Learning & Plasticity"></a>
+    <a href="#artificial" data-label="Bio vs Artificial"></a>
+    <a href="#conclusion" data-label="Conclusion"></a>
+  </div>
+
+  <nav class="navbar" id="navbar">
+    <a href="index.html" class="nav-brand">⟨deep/blog⟩</a>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="deep-learning.html">Deep Learning</a></li>
+      <li><a href="brain.html" class="active">Brain</a></li>
+      <li><a href="universe.html">Universe</a></li>
+    </ul>
+  </nav>
+
+  <!-- Blog Hero -->
+  <section class="blog-hero">
+    <canvas class="hero-canvas" id="neuronHeroCanvas"></canvas>
+    <div class="blog-hero-content">
+      <div class="hero-badge" style="background: rgba(124,58,237,0.08); border-color: rgba(124,58,237,0.2); color: var(--accent-purple);">
+        <span class="dot" style="background: var(--accent-purple);"></span>
+        Neuroscience
+      </div>
+      <h1>How Neurons<br><span class="gradient-text">Compute</span></h1>
+      <p style="color: var(--text-secondary); font-size: 1.15rem; max-width: 650px; margin: 0 auto 1.5rem;">
+        From action potentials to synaptic plasticity — the fundamental computational unit of the brain, explained from first principles with interactive simulations.
+      </p>
+      <div class="blog-meta">
+        <span>📅 March 2026</span>
+        <span>⏱ 40 min read</span>
+        <span>📊 Beginner → Intermediate</span>
+      </div>
+    </div>
+    <div class="hero-overlay"></div>
+  </section>
+
+  <!-- Blog Content -->
+  <article class="blog-article">
+    <div class="container-narrow">
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           1. INTRODUCTION
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="intro">1. Introduction — The Brain's Computational Unit</h2>
+
+      <p>Right now, as you read this sentence, roughly <strong>86 billion neurons</strong> in your brain are firing in intricate patterns. Each one is a tiny electrochemical processor — receiving thousands of inputs, integrating them, and deciding whether to send its own signal forward. Together, they produce everything you experience: sight, sound, thought, memory, consciousness.</p>
+
+      <p>But how does a single neuron <strong>compute</strong>? What does it mean for a biological cell to process information? And how do the principles of neural computation connect to the artificial neural networks that power modern AI?</p>
+
+      <div class="callout insight">
+        <div class="callout-title">Core Intuition</div>
+        <p>A neuron is essentially a <strong>leaky integrator with a threshold</strong>. It collects electrical inputs from other neurons, sums them up (with some leakage over time), and fires an output signal when the sum exceeds a critical threshold. This simple mechanism, replicated billions of times in parallel, gives rise to all of human cognition.</p>
+      </div>
+
+      <p>In this article, we'll build up the full picture of neural computation from the ground up — starting with the anatomy of a single neuron, through the physics of electrical signaling, to the remarkable learning rules that allow the brain to rewire itself. Along the way, you'll interact with simulations that let you trigger action potentials, combine synaptic inputs, and observe spike trains in real time.</p>
+
+      <p>By the end, you'll have a deep understanding of how biology computes — and why understanding it matters for both neuroscience and artificial intelligence.</p>
+
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           2. ANATOMY OF A NEURON
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="anatomy">2. Anatomy of a Neuron</h2>
+
+      <p>A neuron is a specialized cell optimized for one purpose: <strong>rapid long-distance communication</strong>. While neurons come in many shapes and sizes — from the tiny granule cells of the cerebellum to the meter-long motor neurons that reach from your spinal cord to your toes — they all share the same fundamental architecture.</p>
+
+      <h3>2.1 The Four Key Components</h3>
+
+      <p><strong>Dendrites</strong> — the input antennae. These are branching tree-like extensions that receive signals from other neurons. A single neuron can have thousands of dendritic branches, each studded with receptor proteins that detect chemical signals. The total dendritic surface area of a pyramidal neuron can exceed 10,000 μm².</p>
+
+      <p><strong>Soma (Cell Body)</strong> — the integration center. The soma is where all dendritic inputs are combined. It contains the nucleus and the metabolic machinery that keeps the neuron alive. Critically, it's where the decision to fire is made — the axon hillock, at the junction of soma and axon, has the highest density of voltage-gated sodium channels and the lowest threshold for firing.</p>
+
+      <p><strong>Axon</strong> — the output cable. A long, thin fiber that carries the electrical signal (action potential) away from the soma toward other neurons. Axons can be very short (local interneurons) or extremely long (motor neurons). Many axons are wrapped in <strong>myelin</strong>, a fatty insulating sheath that dramatically speeds up signal transmission through saltatory conduction.</p>
+
+      <p><strong>Synaptic Terminals (Boutons)</strong> — the output ports. At the end of the axon, it branches into hundreds of synaptic terminals. Each terminal forms a <strong>synapse</strong> — a specialized junction where the electrical signal is converted to a chemical signal (neurotransmitter release) to communicate with the next neuron.</p>
+
+      <!-- Interactive Neuron Anatomy Figure -->
+      <div class="interactive-section">
+        <h4>Interactive: Neuron Anatomy</h4>
+        <p class="subtitle">Hover over different parts of the neuron to learn more. Watch signals propagate from dendrites through the axon.</p>
+        <div class="canvas-container" id="neuronAnatomyContainer">
+          <canvas id="neuronAnatomyCanvas"></canvas>
+        </div>
+      </div>
+
+      <h3>2.2 Types of Neurons</h3>
+
+      <p>Not all neurons are created equal. The brain uses different specialized types for different functions:</p>
+
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Structure</th>
+            <th>Function</th>
+            <th>Example</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Pyramidal</strong></td>
+            <td>Large soma, long apical dendrite</td>
+            <td>Excitatory output, long-range</td>
+            <td>Cortex, hippocampus</td>
+          </tr>
+          <tr>
+            <td><strong>Purkinje</strong></td>
+            <td>Massive dendritic tree (fan-shaped)</td>
+            <td>Motor coordination</td>
+            <td>Cerebellar cortex</td>
+          </tr>
+          <tr>
+            <td><strong>Interneuron</strong></td>
+            <td>Short axon, local connections</td>
+            <td>Inhibition, local circuit control</td>
+            <td>Throughout brain</td>
+          </tr>
+          <tr>
+            <td><strong>Motor</strong></td>
+            <td>Very long axon (up to 1m)</td>
+            <td>Muscle activation</td>
+            <td>Spinal cord → muscles</td>
+          </tr>
+          <tr>
+            <td><strong>Sensory</strong></td>
+            <td>Pseudo-unipolar</td>
+            <td>Relay sensory information</td>
+            <td>Dorsal root ganglia</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>2.3 The Numbers</h3>
+
+      <p>The scale of neural connectivity is staggering:</p>
+
+      <ul>
+        <li><strong>86 billion</strong> neurons in the human brain</li>
+        <li>Each neuron receives <strong>~7,000 synaptic inputs</strong> on average</li>
+        <li>Total synapses: <strong>~600 trillion</strong> (6 × 10¹⁴)</li>
+        <li>If you counted one synapse per second, it would take <strong>19 million years</strong></li>
+        <li>Axon lengths total <strong>~170,000 km</strong> — enough to wrap around Earth 4 times</li>
+      </ul>
+
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           3. THE RESTING POTENTIAL
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="resting">3. The Resting Potential — A Neuron at Rest</h2>
+
+      <p>Even when a neuron isn't signaling, it's doing something remarkable: maintaining an electrical voltage difference across its membrane. This <strong>resting membrane potential</strong> is the foundation upon which all neural signaling is built.</p>
+
+      <h3>3.1 The Electrochemical Battery</h3>
+
+      <p>The neuron's cell membrane is a thin lipid bilayer — essentially an electrical insulator. Embedded in this membrane are <strong>ion channels</strong> — protein pores that selectively allow specific ions to pass through. The key players are:</p>
+
+      <ul>
+        <li><strong>K⁺ (Potassium)</strong> — high inside, low outside. Wants to flow <em>out</em>.</li>
+        <li><strong>Na⁺ (Sodium)</strong> — high outside, low inside. Wants to flow <em>in</em>.</li>
+        <li><strong>Cl⁻ (Chloride)</strong> — high outside, low inside.</li>
+        <li><strong>A⁻ (Organic anions)</strong> — large negatively charged molecules trapped inside.</li>
+      </ul>
+
+      <p>At rest, the membrane is most permeable to K⁺ (through leak channels). Potassium ions flow out down their concentration gradient, leaving behind negative charges (the trapped anions). This creates a <strong>negative voltage inside</strong> the cell — typically around <strong>−70 mV</strong>.</p>
+
+      <h3>3.2 The Nernst Equation</h3>
+
+      <p>The equilibrium potential for any single ion is given by the <strong>Nernst equation</strong>:</p>
+
+      <div class="math-block" data-math="E_{\text{ion}} = \frac{RT}{zF} \ln \frac{[\text{ion}]_{\text{outside}}}{[\text{ion}]_{\text{inside}}}"></div>
+
+      <p>At body temperature (37°C), this simplifies to approximately:</p>
+
+      <div class="math-block" data-math="E_{\text{ion}} \approx \frac{61.5\,\text{mV}}{z} \log_{10} \frac{[\text{ion}]_{\text{outside}}}{[\text{ion}]_{\text{inside}}}"></div>
+
+      <p>For the major ions in a typical neuron:</p>
+
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Ion</th>
+            <th>Inside (mM)</th>
+            <th>Outside (mM)</th>
+            <th>E<sub>ion</sub></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>K⁺</strong></td>
+            <td>140</td>
+            <td>5</td>
+            <td>−90 mV</td>
+          </tr>
+          <tr>
+            <td><strong>Na⁺</strong></td>
+            <td>15</td>
+            <td>145</td>
+            <td>+60 mV</td>
+          </tr>
+          <tr>
+            <td><strong>Cl⁻</strong></td>
+            <td>10</td>
+            <td>110</td>
+            <td>−70 mV</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>3.3 The Goldman Equation</h3>
+
+      <p>The actual resting potential considers <em>all</em> ions and their relative permeabilities. The <strong>Goldman-Hodgkin-Katz equation</strong> gives:</p>
+
+      <div class="math-block" data-math="V_m = \frac{RT}{F} \ln \frac{P_{K}[K^+]_o + P_{Na}[Na^+]_o + P_{Cl}[Cl^-]_i}{P_{K}[K^+]_i + P_{Na}[Na^+]_i + P_{Cl}[Cl^-]_o}"></div>
+
+      <p>At rest, P<sub>K</sub> is about 40× larger than P<sub>Na</sub>, which is why V<sub>m</sub> ≈ −70 mV (close to E<sub>K</sub> = −90 mV, but pulled toward E<sub>Na</sub> = +60 mV slightly).</p>
+
+      <h3>3.4 The Sodium-Potassium Pump</h3>
+
+      <p>Without active maintenance, the ion gradients would eventually dissipate. The <strong>Na⁺/K⁺-ATPase pump</strong> continuously works against the gradients, pumping <strong>3 Na⁺ out</strong> and <strong>2 K⁺ in</strong> for every ATP molecule consumed. This pump uses roughly <strong>20–40% of the brain's total energy budget</strong> — a testament to how fundamental these gradients are to brain function.</p>
+
+      <div class="callout key">
+        <div class="callout-title">Key Concept: Resting Potential</div>
+        <p>The resting potential (≈ −70 mV) is like a <strong>cocked spring</strong> — it stores potential energy in the form of ion gradients. When the neuron fires, it releases this stored energy in a rapid, controlled burst: the action potential. The Na⁺/K⁺ pump then re-cocks the spring.</p>
+      </div>
+
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           4. THE ACTION POTENTIAL
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="action-potential">4. The Action Potential — The Neuron's Signal</h2>
+
+      <p>The action potential is the neuron's primary communication signal — a rapid, all-or-nothing electrical pulse that travels down the axon at speeds up to <strong>120 m/s</strong>. Understanding the action potential is understanding the language of the brain.</p>
+
+      <h3>4.1 Voltage-Gated Ion Channels</h3>
+
+      <p>The action potential relies on a special class of ion channels that open and close in response to <strong>voltage changes</strong> across the membrane:</p>
+
+      <ul>
+        <li><strong>Voltage-gated Na⁺ channels</strong>: Closed at rest. When the membrane depolarizes to around −55 mV (the <strong>threshold</strong>), they snap open within microseconds, allowing Na⁺ to rush in. They then automatically <strong>inactivate</strong> after ~1 ms, shutting themselves off regardless of voltage.</li>
+        <li><strong>Voltage-gated K⁺ channels</strong>: Also closed at rest, but they open <strong>slower</strong> than Na⁺ channels (delayed rectifiers). They allow K⁺ to flow out, which repolarizes the membrane.</li>
+      </ul>
+
+      <h3>4.2 The Five Phases</h3>
+
+      <div class="steps">
+        <div class="step">
+          <p><strong>Resting (−70 mV)</strong> — The neuron sits at its resting potential. Leak channels maintain the status quo. Voltage-gated channels are closed.</p>
+        </div>
+        <div class="step">
+          <p><strong>Depolarization to Threshold (−70 → −55 mV)</strong> — Synaptic inputs push the membrane potential toward threshold. If the depolarization reaches <strong>−55 mV</strong>, voltage-gated Na⁺ channels begin opening.</p>
+        </div>
+        <div class="step">
+          <p><strong>Rising Phase (−55 → +40 mV)</strong> — Positive feedback loop: Na⁺ channels open → Na⁺ rushes in → membrane depolarizes further → more channels open. This explosive cascade drives the voltage to about <strong>+40 mV</strong> in under 1 ms.</p>
+        </div>
+        <div class="step">
+          <p><strong>Falling Phase (+40 → −80 mV)</strong> — Na⁺ channels inactivate (they can't reopen immediately). K⁺ channels, which opened with a delay, now allow K⁺ to flow out rapidly. The membrane repolarizes and briefly overshoots to about <strong>−80 mV</strong> (hyperpolarization).</p>
+        </div>
+        <div class="step">
+          <p><strong>Recovery (−80 → −70 mV)</strong> — K⁺ channels close. Na⁺ channels reset from inactivated to closed (ready to open again). The membrane returns to its resting potential. During this <strong>refractory period</strong> (~1–2 ms), the neuron cannot fire again — this limits the maximum firing rate to about <strong>500–1000 Hz</strong>.</p>
+        </div>
+      </div>
+
+      <h3>4.3 The Hodgkin-Huxley Model</h3>
+
+      <p>In 1952, Alan Hodgkin and Andrew Huxley published one of the most important models in all of biology — a set of differential equations that quantitatively describe the action potential. They modeled the membrane as an electrical circuit:</p>
+
+      <div class="math-block" data-math="C_m \frac{dV}{dt} = -g_{Na}\,m^3 h\,(V - E_{Na}) - g_K\,n^4\,(V - E_K) - g_L\,(V - E_L) + I_{\text{ext}}"></div>
+
+      <p>Where:</p>
+
+      <ul>
+        <li><span class="inline-math" data-math="C_m"></span> is the membrane capacitance (~1 μF/cm²)</li>
+        <li><span class="inline-math" data-math="g_{Na}, g_K, g_L"></span> are maximum conductances for sodium, potassium, and leak channels</li>
+        <li><span class="inline-math" data-math="m, h, n"></span> are gating variables (0 to 1) that describe the fraction of open channels</li>
+        <li><span class="inline-math" data-math="E_{Na}, E_K, E_L"></span> are reversal potentials</li>
+        <li><span class="inline-math" data-math="I_{\text{ext}}"></span> is external injected current</li>
+      </ul>
+
+      <p>The gating variables evolve according to first-order kinetics:</p>
+
+      <div class="math-block" data-math="\frac{dm}{dt} = \alpha_m(V)(1-m) - \beta_m(V)m"></div>
+
+      <p>where <span class="inline-math" data-math="\alpha_m"></span> and <span class="inline-math" data-math="\beta_m"></span> are voltage-dependent rate constants. This model earned Hodgkin and Huxley the 1963 Nobel Prize in Physiology or Medicine.</p>
+
+      <div class="callout insight">
+        <div class="callout-title">The All-or-Nothing Principle</div>
+        <p>Action potentials don't come in different sizes. Once the threshold is reached, the positive feedback loop always produces the same amplitude pulse (~110 mV peak-to-peak). Information is encoded not in the <em>size</em> of each spike, but in the <em>timing</em> and <em>rate</em> of spikes — similar to how digital circuits use binary pulses rather than analog voltages.</p>
+      </div>
+
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           5. INTERACTIVE: ACTION POTENTIAL SIMULATOR
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="demo-ap">5. Interactive: Action Potential Simulator</h2>
+
+      <p>In this simulation, you inject current into a model neuron and observe the resulting membrane voltage. The model uses a simplified Hodgkin-Huxley framework. Try different current levels to see how the neuron responds — subthreshold inputs produce small deflections, but once you cross threshold, you get a full action potential.</p>
+
+      <div class="interactive-section">
+        <h4>Hodgkin-Huxley Action Potential Simulator</h4>
+        <p class="subtitle">Adjust the injected current and watch the membrane voltage respond in real time. Sub-threshold inputs decay; supra-threshold inputs trigger a full spike.</p>
+        <div class="canvas-container" style="height: 350px;" id="apSimContainer">
+          <canvas id="apSimCanvas"></canvas>
+        </div>
+        <div class="controls">
+          <label>Injected Current (I<sub>ext</sub>):</label>
+          <input type="range" id="apCurrent" min="0" max="20" step="0.5" value="0">
+          <span class="value-display" id="apCurrentVal">0.0 μA</span>
+          <button id="apPulse">⚡ Inject Pulse</button>
+          <button id="apReset">↺ Reset</button>
+        </div>
+        <div class="sampler-legend">
+          <span class="legend-item" style="--legend-color: #00d4ff;">● Membrane Voltage (V<sub>m</sub>)</span>
+          <span class="legend-item" style="--legend-color: #f472b6;">● Na⁺ Conductance (g<sub>Na</sub>)</span>
+          <span class="legend-item" style="--legend-color: #34d399;">● K⁺ Conductance (g<sub>K</sub>)</span>
+        </div>
+      </div>
+
+      <h3>5.1 What to Observe</h3>
+
+      <ul>
+        <li><strong>Below threshold (~7 μA):</strong> The membrane depolarizes slightly but doesn't fire. Remove the current and it returns to rest.</li>
+        <li><strong>At threshold (~7–8 μA):</strong> A full action potential fires. Notice the sharp upstroke (Na⁺ influx) followed by repolarization (K⁺ efflux) and a brief undershoot.</li>
+        <li><strong>Above threshold (~12+ μA):</strong> The neuron fires repeatedly. Higher current → higher firing rate (up to a limit).</li>
+        <li><strong>Click "Inject Pulse":</strong> Delivers a brief 2ms current pulse to trigger a single action potential.</li>
+      </ul>
+
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           6. SYNAPTIC TRANSMISSION
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="synapses">6. Synaptic Transmission — How Neurons Talk</h2>
+
+      <p>The action potential is the neuron's internal signal. But how does one neuron communicate with the next? This happens at <strong>synapses</strong> — specialized junctions where electrical signals are converted to chemical signals and back again.</p>
+
+      <h3>6.1 The Chemical Synapse</h3>
+
+      <p>The vast majority of synapses in the brain are chemical synapses. The process unfolds in a precise sequence:</p>
+
+      <div class="steps">
+        <div class="step">
+          <p><strong>Action potential arrives</strong> at the presynaptic terminal (axon bouton).</p>
+        </div>
+        <div class="step">
+          <p><strong>Voltage-gated Ca²⁺ channels open</strong> — calcium ions flood into the terminal.</p>
+        </div>
+        <div class="step">
+          <p><strong>Ca²⁺ triggers vesicle fusion</strong> — synaptic vesicles (tiny membrane-bound sacs containing neurotransmitter molecules) fuse with the presynaptic membrane and release their contents into the <strong>synaptic cleft</strong> (a 20–40 nm gap).</p>
+        </div>
+        <div class="step">
+          <p><strong>Neurotransmitters bind receptors</strong> — on the postsynaptic membrane, receptor proteins detect the neurotransmitter molecules and open ion channels in response.</p>
+        </div>
+        <div class="step">
+          <p><strong>Postsynaptic potential generated</strong> — ions flow through the opened channels, changing the postsynaptic membrane potential. This creates either an <strong>EPSP</strong> (excitatory) or <strong>IPSP</strong> (inhibitory) depending on the type of channel opened.</p>
+        </div>
+        <div class="step">
+          <p><strong>Signal termination</strong> — neurotransmitters are rapidly cleared from the cleft by enzymatic degradation (e.g., acetylcholinesterase), reuptake into the presynaptic terminal, or diffusion away.</p>
+        </div>
+      </div>
+
+      <h3>6.2 Major Neurotransmitter Systems</h3>
+
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Neurotransmitter</th>
+            <th>Type</th>
+            <th>Action</th>
+            <th>Key Roles</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Glutamate</strong></td>
+            <td>Amino acid</td>
+            <td>Excitatory (main)</td>
+            <td>Learning, memory, ~80% of synapses</td>
+          </tr>
+          <tr>
+            <td><strong>GABA</strong></td>
+            <td>Amino acid</td>
+            <td>Inhibitory (main)</td>
+            <td>Circuit control, ~20% of synapses</td>
+          </tr>
+          <tr>
+            <td><strong>Dopamine</strong></td>
+            <td>Monoamine</td>
+            <td>Modulatory</td>
+            <td>Reward, motivation, motor control</td>
+          </tr>
+          <tr>
+            <td><strong>Serotonin</strong></td>
+            <td>Monoamine</td>
+            <td>Modulatory</td>
+            <td>Mood, sleep, appetite</td>
+          </tr>
+          <tr>
+            <td><strong>Acetylcholine</strong></td>
+            <td>Ester</td>
+            <td>Excitatory/Modulatory</td>
+            <td>Muscle control, attention, memory</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>6.3 Electrical Synapses (Gap Junctions)</h3>
+
+      <p>A smaller class of synapses — <strong>gap junctions</strong> — provide direct electrical coupling between neurons. These are literally pores (connexon channels) that connect the cytoplasm of two cells, allowing ions and small molecules to pass directly. They're <strong>faster</strong> than chemical synapses (no synaptic delay), <strong>bidirectional</strong>, and are used where synchronous firing is critical — for example, in the brainstem circuits that control breathing.</p>
+
+      <div class="callout warning">
+        <div class="callout-title">Scale of the Problem</div>
+        <p>Each neurotransmitter vesicle contains roughly <strong>5,000 molecules</strong>. When a single action potential arrives at a synapse, it triggers the release of <strong>1–10 vesicles</strong>. Those 5,000–50,000 molecules must diffuse across the cleft, bind receptors, open channels, and be cleared — all within <strong>1–2 milliseconds</strong>. It's extraordinarily fast chemistry.</p>
+      </div>
+
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           7. NEURAL INTEGRATION
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="integration">7. Neural Integration — The Decision to Fire</h2>
+
+      <p>A neuron in the cortex receives inputs from about <strong>7,000 other neurons</strong> simultaneously. Some are excitatory (pushing the membrane toward threshold), others are inhibitory (pulling it away). The neuron must somehow integrate all of these competing signals to decide: <strong>fire or not fire?</strong></p>
+
+      <h3>7.1 EPSPs and IPSPs</h3>
+
+      <p>When an excitatory synapse is activated, it opens channels permeable to Na⁺ (and sometimes Ca²⁺), producing a small depolarization called an <strong>Excitatory Postsynaptic Potential (EPSP)</strong>. A single EPSP is typically only about <strong>0.5–1 mV</strong> — far too small to reach the threshold of −55 mV from the resting potential of −70 mV.</p>
+
+      <p>Inhibitory synapses open Cl⁻ channels or K⁺ channels, producing an <strong>Inhibitory Postsynaptic Potential (IPSP)</strong> — a small hyperpolarization that moves the membrane <em>away</em> from threshold.</p>
+
+      <h3>7.2 Spatial and Temporal Summation</h3>
+
+      <p><strong>Spatial summation:</strong> EPSPs from <em>different synapses</em> at the same time add up. If 20 excitatory synapses fire simultaneously, each producing 1 mV, the combined effect is roughly 15–20 mV — enough to reach threshold. (It's less than a linear sum because the EPSPs interact nonlinearly with the dendritic cable properties.)</p>
+
+      <p><strong>Temporal summation:</strong> EPSPs from the <em>same synapse</em> firing rapidly can overlap. Each EPSP decays exponentially with a time constant τ ≈ 10–20 ms. If a second EPSP arrives before the first has fully decayed, they stack:</p>
+
+      <div class="math-block" data-math="V(t) = V_{\text{rest}} + \sum_{i} w_i \cdot \epsilon(t - t_i), \quad \epsilon(t) = \frac{t}{\tau} e^{1 - t/\tau} \cdot \Theta(t)"></div>
+
+      <p>where <span class="inline-math" data-math="w_i"></span> is the synaptic weight, <span class="inline-math" data-math="t_i"></span> is the arrival time of each input, <span class="inline-math" data-math="\epsilon(t)"></span> is the postsynaptic potential kernel, and <span class="inline-math" data-math="\Theta(t)"></span> is the Heaviside step function.</p>
+
+      <h3>7.3 The Leaky Integrate-and-Fire Model</h3>
+
+      <p>The simplest computational model that captures neural integration is the <strong>Leaky Integrate-and-Fire (LIF)</strong> model:</p>
+
+      <div class="math-block" data-math="\tau_m \frac{dV}{dt} = -(V - V_{\text{rest}}) + R_m \cdot I_{\text{syn}}(t)"></div>
+
+      <p>with the reset rule: when <span class="inline-math" data-math="V \geq V_{\text{thresh}}"></span>, emit a spike and reset <span class="inline-math" data-math="V \leftarrow V_{\text{reset}}"></span>.</p>
+
+      <p>Despite its simplicity, the LIF model captures the core computational operation: <strong>weighted summation of inputs with a leak, followed by a threshold nonlinearity</strong>. This is exactly the same operation performed by an artificial neuron in a neural network — with the important addition of temporal dynamics.</p>
+
+      <div class="callout key">
+        <div class="callout-title">The Neuron as a Computer</div>
+        <p>At its core, a neuron computes: <strong>output = f(Σ wᵢxᵢ)</strong>, where xᵢ are input spike trains, wᵢ are synaptic weights, Σ is temporal integration with leakage, and f is the threshold nonlinearity. The brain's power comes not from the sophistication of this single operation, but from the <strong>massive parallelism</strong> and the <strong>adaptable weights</strong> (learning).</p>
+      </div>
+
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           8. INTERACTIVE: SYNAPTIC INTEGRATION
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="demo-integration">8. Interactive: Synaptic Integration Simulator</h2>
+
+      <p>In this simulation, you control the excitatory and inhibitory inputs to a leaky integrate-and-fire neuron. Watch how multiple inputs combine to push the membrane potential toward or away from threshold. When threshold is crossed, the neuron fires a spike.</p>
+
+      <div class="interactive-section">
+        <h4>Leaky Integrate-and-Fire Neuron</h4>
+        <p class="subtitle">Click the buttons to deliver excitatory (green) or inhibitory (red) synaptic inputs. Watch the membrane potential integrate them in real time.</p>
+        <div class="canvas-container" style="height: 320px;" id="lifSimContainer">
+          <canvas id="lifSimCanvas"></canvas>
+        </div>
+        <div class="controls">
+          <button id="lifExcite" style="background: rgba(52,211,153,0.15); border-color: var(--accent-green); color: var(--accent-green);">+ Excitatory</button>
+          <button id="lifInhibit" style="background: rgba(248,113,113,0.15); border-color: var(--accent-red); color: var(--accent-red);">− Inhibitory</button>
+          <button id="lifBurst">⚡ Burst (5×)</button>
+          <button id="lifReset">↺ Reset</button>
+          <label>Leak τ:</label>
+          <input type="range" id="lifTau" min="5" max="50" step="1" value="20">
+          <span class="value-display" id="lifTauVal">20 ms</span>
+        </div>
+        <div class="sampler-legend">
+          <span class="legend-item" style="--legend-color: #00d4ff;">● Membrane Voltage</span>
+          <span class="legend-item" style="--legend-color: rgba(255,255,255,0.25);">― ― Threshold (−55 mV)</span>
+          <span class="legend-item" style="--legend-color: #34d399;">▲ Excitatory Input</span>
+          <span class="legend-item" style="--legend-color: #f87171;">▼ Inhibitory Input</span>
+        </div>
+      </div>
+
+      <h3>8.1 What to Try</h3>
+
+      <ul>
+        <li><strong>Single excitatory input:</strong> A small bump that decays — not enough to fire.</li>
+        <li><strong>Burst (5×):</strong> Rapid excitatory inputs that temporally summate and may reach threshold.</li>
+        <li><strong>Mixed inputs:</strong> Add inhibitory inputs between excitatory ones — they cancel out, preventing firing.</li>
+        <li><strong>Change leak τ:</strong> Lower τ = faster decay (harder to summate). Higher τ = longer memory (easier to fire).</li>
+      </ul>
+
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           9. NEURAL CODING
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="coding">9. Neural Coding — How Information Is Represented</h2>
+
+      <p>If action potentials are all-or-nothing (same shape every time), how does the brain encode the <em>richness</em> of sensory experience? How does it distinguish a whisper from a shout, or red from blue? This is the question of <strong>neural coding</strong>.</p>
+
+      <h3>9.1 Rate Coding</h3>
+
+      <p>The simplest and most well-established code: <strong>firing rate</strong>. The stronger the stimulus, the more frequently the neuron fires. When you press harder on your skin, touch receptors fire at higher rates. When a visual neuron sees a brighter light, its rate increases.</p>
+
+      <p>The relationship between stimulus intensity <em>s</em> and firing rate <em>r</em> often follows a sigmoidal function:</p>
+
+      <div class="math-block" data-math="r(s) = r_{\max} \cdot \frac{s^n}{s^n + s_{50}^n}"></div>
+
+      <p>where <span class="inline-math" data-math="s_{50}"></span> is the stimulus at half-maximal rate and <em>n</em> is the Hill coefficient controlling the steepness. This is remarkably similar to the sigmoid activation functions used in artificial neural networks.</p>
+
+      <h3>9.2 Temporal Coding</h3>
+
+      <p>But rate isn't the whole story. The <strong>precise timing</strong> of spikes carries additional information. Evidence includes:</p>
+
+      <ul>
+        <li><strong>Phase coding in hippocampus:</strong> As a rat runs through a place field, the neuron's spikes shift earlier and earlier relative to the theta oscillation — encoding the animal's position more precisely than rate alone.</li>
+        <li><strong>Sound localization:</strong> Your brain detects the microsecond difference in arrival time between your two ears — this requires spike-timing precision of ~10 μs.</li>
+        <li><strong>Synchrony coding:</strong> Neurons that fire together may "bind" features into a unified percept (the binding problem). Synchronous spikes have a stronger effect on downstream neurons than asynchronous ones.</li>
+      </ul>
+
+      <h3>9.3 Population Coding</h3>
+
+      <p>In practice, information is almost never carried by a single neuron. Instead, <strong>populations</strong> of neurons represent stimuli collectively. For example, the direction of a visual motion stimulus is encoded by the relative firing rates of many direction-selective neurons — each tuned to a different preferred direction:</p>
+
+      <div class="math-block" data-math="\hat{\theta} = \text{arg}\left(\sum_i r_i \, e^{i\theta_i}\right)"></div>
+
+      <p>This population vector decoding is used by the brain to represent movement direction in the motor cortex and has been successfully used in brain-computer interfaces to allow paralyzed patients to control robotic arms.</p>
+
+      <div class="callout insight">
+        <div class="callout-title">The Coding Debate</div>
+        <p>Whether the brain primarily uses rate codes, temporal codes, or population codes remains one of the great ongoing debates in neuroscience. The reality is likely that <strong>all three are used</strong>, with different codes predominating in different brain regions and for different types of information.</p>
+      </div>
+
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           10. INTERACTIVE: SPIKE TRAIN VISUALIZER
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="demo-spikes">10. Interactive: Spike Train Visualizer</h2>
+
+      <p>In this visualization, you control the input stimulus intensity to a model neuron and observe its spike train (sequence of action potentials). Notice how the interspike interval decreases (firing rate increases) with stronger stimuli. The bottom panel shows the instantaneous firing rate over time.</p>
+
+      <div class="interactive-section">
+        <h4>Spike Train Generator</h4>
+        <p class="subtitle">Adjust the stimulus intensity and observe the resulting spike pattern. Higher stimulus = faster firing. The f-I curve (firing rate vs. current) appears in the corner.</p>
+        <div class="canvas-container" style="height: 350px;" id="spikeTrainContainer">
+          <canvas id="spikeTrainCanvas"></canvas>
+        </div>
+        <div class="controls">
+          <label>Stimulus Intensity:</label>
+          <input type="range" id="spikeStimulus" min="0" max="100" step="1" value="40">
+          <span class="value-display" id="spikeStimulusVal">40%</span>
+          <label>Noise Level:</label>
+          <input type="range" id="spikeNoise" min="0" max="50" step="1" value="10">
+          <span class="value-display" id="spikeNoiseVal">10%</span>
+          <button id="spikeReset">↺ Reset</button>
+        </div>
+        <div class="sampler-legend">
+          <span class="legend-item" style="--legend-color: #00d4ff;">● Membrane Potential</span>
+          <span class="legend-item" style="--legend-color: #f472b6;">| Spike Events</span>
+          <span class="legend-item" style="--legend-color: #fb923c;">● Firing Rate (Hz)</span>
+        </div>
+      </div>
+
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           11. LEARNING & PLASTICITY
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="plasticity">11. Learning & Plasticity — How the Brain Rewires Itself</h2>
+
+      <p>The most remarkable feature of the brain isn't its ability to compute — it's its ability to <strong>learn</strong>. The connections between neurons aren't fixed; they're continuously modified by experience. This property — <strong>synaptic plasticity</strong> — is the biological foundation of all learning and memory.</p>
+
+      <h3>11.1 Hebb's Rule (1949)</h3>
+
+      <p>Donald Hebb proposed the foundational principle: <em>"Neurons that fire together, wire together."</em> More precisely:</p>
+
+      <div class="callout key">
+        <div class="callout-title">Hebbian Learning</div>
+        <p><em>"When an axon of cell A is near enough to excite cell B and repeatedly or persistently takes part in firing it, some growth process or metabolic change takes place in one or both cells such that A's efficiency, as one of the cells firing B, is increased."</em> — Donald Hebb, <em>The Organization of Behavior</em> (1949)</p>
+      </div>
+
+      <p>In modern terms, the Hebbian learning rule can be written as:</p>
+
+      <div class="math-block" data-math="\Delta w_{ij} = \eta \cdot x_i \cdot x_j"></div>
+
+      <p>where <span class="inline-math" data-math="w_{ij}"></span> is the synaptic weight from neuron <em>i</em> to neuron <em>j</em>, <span class="inline-math" data-math="x_i, x_j"></span> are their activities, and <span class="inline-math" data-math="\eta"></span> is the learning rate. This is exactly the outer product learning rule used in early neural network models (Hopfield networks).</p>
+
+      <h3>11.2 Long-Term Potentiation (LTP)</h3>
+
+      <p>The biological implementation of Hebb's rule was discovered in 1973 by Bliss and Lømo. <strong>Long-Term Potentiation (LTP)</strong> is a lasting increase in synaptic strength following high-frequency stimulation. The key molecular mechanism involves the <strong>NMDA receptor</strong> — a glutamate receptor that acts as a coincidence detector:</p>
+
+      <ul>
+        <li>The NMDA channel is blocked by a Mg²⁺ ion at resting potential.</li>
+        <li>When the postsynaptic membrane is depolarized (by other inputs), the Mg²⁺ block is relieved.</li>
+        <li>If glutamate is also present (presynaptic activity), the channel opens and allows Ca²⁺ to enter.</li>
+        <li>The Ca²⁺ influx triggers intracellular cascades that increase the number and conductance of AMPA receptors.</li>
+      </ul>
+
+      <p>This requires <strong>both pre- and post-synaptic activity</strong> — exactly Hebb's rule! The NMDA receptor is the molecular implementation of "fire together, wire together."</p>
+
+      <h3>11.3 Long-Term Depression (LTD)</h3>
+
+      <p>The counterpart to LTP, <strong>Long-Term Depression</strong> weakens synaptic connections when presynaptic activity occurs without sufficient postsynaptic depolarization. This prevents runaway excitation and allows the network to forget outdated associations.</p>
+
+      <h3>11.4 Spike-Timing-Dependent Plasticity (STDP)</h3>
+
+      <p>A more precise form of plasticity depends on the relative <em>timing</em> of pre- and postsynaptic spikes:</p>
+
+      <div class="math-block" data-math="\Delta w = \begin{cases} A_+ \exp(-\Delta t / \tau_+) & \text{if } \Delta t > 0 \text{ (pre before post → LTP)} \\ -A_- \exp(\Delta t / \tau_-) & \text{if } \Delta t < 0 \text{ (post before pre → LTD)} \end{cases}"></div>
+
+      <p>where <span class="inline-math" data-math="\Delta t = t_{\text{post}} - t_{\text{pre}}"></span>. STDP creates a precise causal learning rule: synapses that <em>cause</em> the postsynaptic neuron to fire (pre before post) are strengthened, while those that don't contribute (post before pre) are weakened. This has deep connections to reinforcement learning and temporal difference learning in AI.</p>
+
+      <h3>11.5 Structural Plasticity</h3>
+
+      <p>Beyond changing synaptic strengths, the brain can create entirely new synapses and eliminate old ones. Dendritic spines — tiny protrusions where most excitatory synapses form — are remarkably dynamic:</p>
+
+      <ul>
+        <li>New spines can appear within <strong>minutes</strong> of learning</li>
+        <li>Unused spines are pruned over <strong>days to weeks</strong></li>
+        <li>Stable spines can persist for <strong>years</strong> — they may represent long-term memories</li>
+        <li>Adolescence involves massive synaptic pruning (~40% of synapses are eliminated)</li>
+      </ul>
+
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           12. BIOLOGICAL vs ARTIFICIAL NEURONS
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="artificial">12. Biological vs. Artificial Neurons</h2>
+
+      <p>The artificial neurons used in deep learning were originally inspired by biological neurons, but the two have diverged significantly. Understanding both illuminates the strengths and limitations of each.</p>
+
+      <h3>12.1 The Artificial Neuron</h3>
+
+      <p>An artificial neuron computes:</p>
+
+      <div class="math-block" data-math="y = \sigma\!\left(\sum_{i=1}^{n} w_i x_i + b\right)"></div>
+
+      <p>where <span class="inline-math" data-math="\sigma"></span> is a nonlinear activation function (ReLU, sigmoid, etc.), <span class="inline-math" data-math="w_i"></span> are learned weights, <span class="inline-math" data-math="x_i"></span> are inputs, and <span class="inline-math" data-math="b"></span> is a bias term.</p>
+
+      <h3>12.2 Comparison</h3>
+
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Property</th>
+            <th>Biological Neuron</th>
+            <th>Artificial Neuron</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Signal type</strong></td>
+            <td>Discrete spikes (temporal)</td>
+            <td>Continuous values (static)</td>
+          </tr>
+          <tr>
+            <td><strong>Computation</strong></td>
+            <td>Leaky integration + threshold</td>
+            <td>Weighted sum + activation</td>
+          </tr>
+          <tr>
+            <td><strong>Learning rule</strong></td>
+            <td>STDP, neuromodulation (local)</td>
+            <td>Backpropagation (global)</td>
+          </tr>
+          <tr>
+            <td><strong>Connections</strong></td>
+            <td>~7,000 inputs/neuron, sparse</td>
+            <td>Dense or structured</td>
+          </tr>
+          <tr>
+            <td><strong>Speed</strong></td>
+            <td>~1 ms per spike (slow)</td>
+            <td>~1 ns per operation (fast)</td>
+          </tr>
+          <tr>
+            <td><strong>Energy</strong></td>
+            <td>~20 W total brain</td>
+            <td>~300 W per GPU</td>
+          </tr>
+          <tr>
+            <td><strong>Parallelism</strong></td>
+            <td>86 billion in parallel</td>
+            <td>Thousands of cores</td>
+          </tr>
+          <tr>
+            <td><strong>Dendrites</strong></td>
+            <td>Active, nonlinear processing</td>
+            <td>Not modeled</td>
+          </tr>
+          <tr>
+            <td><strong>Noise</strong></td>
+            <td>Inherently stochastic</td>
+            <td>Deterministic (mostly)</td>
+          </tr>
+          <tr>
+            <td><strong>Plasticity</strong></td>
+            <td>Continuous, activity-dependent</td>
+            <td>Only during training</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>12.3 What AI Misses</h3>
+
+      <p>Several features of biological neurons have no counterpart in standard artificial neural networks:</p>
+
+      <ul>
+        <li><strong>Dendritic computation:</strong> Biological dendrites aren't passive cables — they perform local nonlinear operations (dendritic spikes, plateau potentials). A single biological neuron may be computationally equivalent to a <strong>5–8 layer deep network</strong>.</li>
+        <li><strong>Neuromodulation:</strong> Global signals (dopamine, serotonin, norepinephrine) modify how entire circuits process information — there's no real equivalent in standard deep learning.</li>
+        <li><strong>Temporal dynamics:</strong> Biological neurons operate in continuous time with memory (adaptation, facilitation, depression). Standard ANNs process static snapshots.</li>
+        <li><strong>Energy efficiency:</strong> The brain achieves its computation with ~20 watts. Training GPT-4 consumed an estimated ~50 GWh. Biology is roughly <strong>10 million times</strong> more energy-efficient per operation.</li>
+      </ul>
+
+      <h3>12.4 Neuromorphic Computing</h3>
+
+      <p>A growing field of research attempts to bridge this gap: <strong>neuromorphic engineering</strong> builds hardware that mimics biological neural circuits. Chips like Intel's Loihi and IBM's TrueNorth implement spiking neural networks in silicon, achieving orders-of-magnitude better energy efficiency than GPUs for certain tasks.</p>
+
+      <div class="callout insight">
+        <div class="callout-title">The Future</div>
+        <p>The next generation of AI may draw more heavily from neuroscience. Spiking neural networks, dendritic computation, local learning rules, and neuromodulation are all active areas of research that could lead to more efficient, more capable, and perhaps even more conscious artificial systems.</p>
+      </div>
+
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           13. PYTHON CODE: SIMULATING NEURONS
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="code">13. Code: Simulating Neural Computation</h2>
+
+      <p>Here's a complete Python implementation of the models discussed in this article. You can run these to reproduce the dynamics shown in the interactive demos above.</p>
+
+      <h3>13.1 Leaky Integrate-and-Fire Neuron</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span>lif_neuron.py</span>
+        </div>
+        <pre><code><span class="token-keyword">import</span> <span class="token-variable">numpy</span> <span class="token-keyword">as</span> <span class="token-variable">np</span>
+<span class="token-keyword">import</span> <span class="token-variable">matplotlib.pyplot</span> <span class="token-keyword">as</span> <span class="token-variable">plt</span>
+
+<span class="token-keyword">def</span> <span class="token-function">simulate_lif</span>(<span class="token-param">I_ext</span>, <span class="token-param">T</span>=<span class="token-number">500</span>, <span class="token-param">dt</span>=<span class="token-number">0.1</span>,
+                   <span class="token-param">tau_m</span>=<span class="token-number">20.0</span>, <span class="token-param">V_rest</span>=<span class="token-number">-70.0</span>,
+                   <span class="token-param">V_thresh</span>=<span class="token-number">-55.0</span>, <span class="token-param">V_reset</span>=<span class="token-number">-75.0</span>,
+                   <span class="token-param">R_m</span>=<span class="token-number">10.0</span>):
+    <span class="token-string">"""Simulate a Leaky Integrate-and-Fire neuron."""</span>
+    steps = <span class="token-function">int</span>(T / dt)
+    V = np.<span class="token-function">zeros</span>(steps)
+    spikes = []
+    V[<span class="token-number">0</span>] = V_rest
+
+    <span class="token-keyword">for</span> t <span class="token-keyword">in</span> <span class="token-function">range</span>(<span class="token-number">1</span>, steps):
+        dV = (-(V[t-<span class="token-number">1</span>] - V_rest) + R_m * I_ext[t]) / tau_m
+        V[t] = V[t-<span class="token-number">1</span>] + dV * dt
+
+        <span class="token-keyword">if</span> V[t] >= V_thresh:
+            spikes.<span class="token-function">append</span>(t * dt)
+            V[t] = V_reset
+
+    <span class="token-keyword">return</span> V, spikes
+
+<span class="token-comment"># Constant current injection</span>
+T, dt = <span class="token-number">500</span>, <span class="token-number">0.1</span>
+I = np.<span class="token-function">ones</span>(<span class="token-function">int</span>(T/dt)) * <span class="token-number">2.0</span>
+V, spikes = <span class="token-function">simulate_lif</span>(I, T, dt)
+
+time = np.<span class="token-function">arange</span>(<span class="token-number">0</span>, T, dt)
+plt.<span class="token-function">figure</span>(figsize=(<span class="token-number">12</span>, <span class="token-number">4</span>))
+plt.<span class="token-function">plot</span>(time, V, color=<span class="token-string">'#00d4ff'</span>, lw=<span class="token-number">1.5</span>)
+plt.<span class="token-function">axhline</span>(-<span class="token-number">55</span>, color=<span class="token-string">'white'</span>, ls=<span class="token-string">'--'</span>, alpha=<span class="token-number">0.3</span>, label=<span class="token-string">'Threshold'</span>)
+plt.<span class="token-function">xlabel</span>(<span class="token-string">'Time (ms)'</span>)
+plt.<span class="token-function">ylabel</span>(<span class="token-string">'Membrane Potential (mV)'</span>)
+plt.<span class="token-function">title</span>(<span class="token-string">'LIF Neuron Response'</span>)
+plt.<span class="token-function">legend</span>()
+plt.<span class="token-function">show</span>()</code></pre>
+      </div>
+
+      <h3>13.2 Hodgkin-Huxley Model</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span>hodgkin_huxley.py</span>
+        </div>
+        <pre><code><span class="token-keyword">import</span> <span class="token-variable">numpy</span> <span class="token-keyword">as</span> <span class="token-variable">np</span>
+
+<span class="token-keyword">class</span> <span class="token-class">HodgkinHuxley</span>:
+    <span class="token-string">"""Full Hodgkin-Huxley neuron model."""</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">__init__</span>(<span class="token-param">self</span>):
+        self.C_m  = <span class="token-number">1.0</span>     <span class="token-comment"># μF/cm²</span>
+        self.g_Na = <span class="token-number">120.0</span>   <span class="token-comment"># mS/cm²</span>
+        self.g_K  = <span class="token-number">36.0</span>
+        self.g_L  = <span class="token-number">0.3</span>
+        self.E_Na = <span class="token-number">50.0</span>    <span class="token-comment"># mV</span>
+        self.E_K  = <span class="token-number">-77.0</span>
+        self.E_L  = <span class="token-number">-54.387</span>
+
+    <span class="token-keyword">def</span> <span class="token-function">alpha_m</span>(<span class="token-param">self</span>, <span class="token-param">V</span>):
+        <span class="token-keyword">return</span> <span class="token-number">0.1</span> * (V + <span class="token-number">40</span>) / (<span class="token-number">1</span> - np.<span class="token-function">exp</span>(-(V + <span class="token-number">40</span>) / <span class="token-number">10</span>))
+
+    <span class="token-keyword">def</span> <span class="token-function">beta_m</span>(<span class="token-param">self</span>, <span class="token-param">V</span>):
+        <span class="token-keyword">return</span> <span class="token-number">4.0</span> * np.<span class="token-function">exp</span>(-(V + <span class="token-number">65</span>) / <span class="token-number">18</span>)
+
+    <span class="token-keyword">def</span> <span class="token-function">alpha_h</span>(<span class="token-param">self</span>, <span class="token-param">V</span>):
+        <span class="token-keyword">return</span> <span class="token-number">0.07</span> * np.<span class="token-function">exp</span>(-(V + <span class="token-number">65</span>) / <span class="token-number">20</span>)
+
+    <span class="token-keyword">def</span> <span class="token-function">beta_h</span>(<span class="token-param">self</span>, <span class="token-param">V</span>):
+        <span class="token-keyword">return</span> <span class="token-number">1.0</span> / (<span class="token-number">1</span> + np.<span class="token-function">exp</span>(-(V + <span class="token-number">35</span>) / <span class="token-number">10</span>))
+
+    <span class="token-keyword">def</span> <span class="token-function">alpha_n</span>(<span class="token-param">self</span>, <span class="token-param">V</span>):
+        <span class="token-keyword">return</span> <span class="token-number">0.01</span> * (V + <span class="token-number">55</span>) / (<span class="token-number">1</span> - np.<span class="token-function">exp</span>(-(V + <span class="token-number">55</span>) / <span class="token-number">10</span>))
+
+    <span class="token-keyword">def</span> <span class="token-function">beta_n</span>(<span class="token-param">self</span>, <span class="token-param">V</span>):
+        <span class="token-keyword">return</span> <span class="token-number">0.125</span> * np.<span class="token-function">exp</span>(-(V + <span class="token-number">65</span>) / <span class="token-number">80</span>)
+
+    <span class="token-keyword">def</span> <span class="token-function">simulate</span>(<span class="token-param">self</span>, <span class="token-param">I_ext</span>, <span class="token-param">T</span>=<span class="token-number">50</span>, <span class="token-param">dt</span>=<span class="token-number">0.01</span>):
+        steps = <span class="token-function">int</span>(T / dt)
+        V = np.<span class="token-function">zeros</span>(steps);  V[<span class="token-number">0</span>] = -<span class="token-number">65.0</span>
+        m = np.<span class="token-function">zeros</span>(steps);  m[<span class="token-number">0</span>] = <span class="token-number">0.05</span>
+        h = np.<span class="token-function">zeros</span>(steps);  h[<span class="token-number">0</span>] = <span class="token-number">0.6</span>
+        n = np.<span class="token-function">zeros</span>(steps);  n[<span class="token-number">0</span>] = <span class="token-number">0.32</span>
+
+        <span class="token-keyword">for</span> i <span class="token-keyword">in</span> <span class="token-function">range</span>(<span class="token-number">1</span>, steps):
+            I_Na = self.g_Na * m[i-<span class="token-number">1</span>]**<span class="token-number">3</span> * h[i-<span class="token-number">1</span>] * (V[i-<span class="token-number">1</span>] - self.E_Na)
+            I_K  = self.g_K  * n[i-<span class="token-number">1</span>]**<span class="token-number">4</span> * (V[i-<span class="token-number">1</span>] - self.E_K)
+            I_L  = self.g_L  * (V[i-<span class="token-number">1</span>] - self.E_L)
+
+            dV = (I_ext - I_Na - I_K - I_L) / self.C_m
+            V[i] = V[i-<span class="token-number">1</span>] + dV * dt
+
+            dm = self.<span class="token-function">alpha_m</span>(V[i-<span class="token-number">1</span>]) * (<span class="token-number">1</span>-m[i-<span class="token-number">1</span>]) - self.<span class="token-function">beta_m</span>(V[i-<span class="token-number">1</span>]) * m[i-<span class="token-number">1</span>]
+            dh = self.<span class="token-function">alpha_h</span>(V[i-<span class="token-number">1</span>]) * (<span class="token-number">1</span>-h[i-<span class="token-number">1</span>]) - self.<span class="token-function">beta_h</span>(V[i-<span class="token-number">1</span>]) * h[i-<span class="token-number">1</span>]
+            dn = self.<span class="token-function">alpha_n</span>(V[i-<span class="token-number">1</span>]) * (<span class="token-number">1</span>-n[i-<span class="token-number">1</span>]) - self.<span class="token-function">beta_n</span>(V[i-<span class="token-number">1</span>]) * n[i-<span class="token-number">1</span>]
+
+            m[i] = m[i-<span class="token-number">1</span>] + dm * dt
+            h[i] = h[i-<span class="token-number">1</span>] + dh * dt
+            n[i] = n[i-<span class="token-number">1</span>] + dn * dt
+
+        <span class="token-keyword">return</span> V, m, h, n
+
+hh = <span class="token-class">HodgkinHuxley</span>()
+V, m, h, n = hh.<span class="token-function">simulate</span>(I_ext=<span class="token-number">10.0</span>, T=<span class="token-number">50</span>)</code></pre>
+      </div>
+
+      <h3>13.3 STDP Learning Rule</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span>stdp.py</span>
+        </div>
+        <pre><code><span class="token-keyword">def</span> <span class="token-function">stdp_update</span>(<span class="token-param">pre_times</span>, <span class="token-param">post_times</span>, <span class="token-param">w</span>,
+                   <span class="token-param">A_plus</span>=<span class="token-number">0.01</span>, <span class="token-param">A_minus</span>=<span class="token-number">0.012</span>,
+                   <span class="token-param">tau_plus</span>=<span class="token-number">20.0</span>, <span class="token-param">tau_minus</span>=<span class="token-number">20.0</span>,
+                   <span class="token-param">w_max</span>=<span class="token-number">1.0</span>):
+    <span class="token-string">"""Apply STDP weight updates based on spike timing."""</span>
+    <span class="token-keyword">for</span> t_pre <span class="token-keyword">in</span> pre_times:
+        <span class="token-keyword">for</span> t_post <span class="token-keyword">in</span> post_times:
+            dt = t_post - t_pre
+            <span class="token-keyword">if</span> dt > <span class="token-number">0</span>:
+                w += A_plus * np.<span class="token-function">exp</span>(-dt / tau_plus)
+            <span class="token-keyword">else</span>:
+                w -= A_minus * np.<span class="token-function">exp</span>(dt / tau_minus)
+    <span class="token-keyword">return</span> np.<span class="token-function">clip</span>(w, <span class="token-number">0</span>, w_max)</code></pre>
+      </div>
+
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           14. CONCLUSION
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="conclusion">14. Conclusion — The Elegance of Neural Computation</h2>
+
+      <p>We've journeyed through the full stack of neural computation — from the ions that create the resting potential, through the explosive cascade of the action potential, across the chemical synapse, into the integrative soma, and up to the learning rules that reshape the network with experience.</p>
+
+      <p>The picture that emerges is both simple and profound: <strong>a neuron is a leaky integrator with a threshold and adaptive weights</strong>. This deceptively simple operation, repeated 86 billion times in massively parallel networks with 600 trillion adaptive connections, gives rise to everything the human mind can do.</p>
+
+      <p>Several key themes run through this story:</p>
+
+      <ul>
+        <li><strong>Simplicity breeds complexity:</strong> The individual computational unit is simple. The complexity arises from the connectivity and the learning rules.</li>
+        <li><strong>Energy is precious:</strong> The brain has evolved extraordinary mechanisms to compute efficiently — using 20 watts where artificial systems need kilowatts.</li>
+        <li><strong>Time matters:</strong> Unlike artificial neural networks, the brain computes in continuous time. Spike timing, oscillations, and temporal dynamics are not just noise — they carry information.</li>
+        <li><strong>Everything is plastic:</strong> The brain never stops rewiring. Every experience subtly modifies the synaptic weights, creating the substrate of memory and learning.</li>
+      </ul>
+
+      <div class="callout insight">
+        <div class="callout-title">What's Next</div>
+        <p>In the next article in this series — <strong>Theories of Consciousness</strong> — we'll explore how the brain's computational machinery might give rise to subjective experience. From Integrated Information Theory to Global Workspace Theory, we'll examine the leading frameworks for understanding the deepest mystery of all: why there is "something it is like" to be a brain.</p>
+      </div>
+
+      <p style="text-align: center; margin-top: 3rem;">
+        <a href="brain.html" class="btn btn-secondary">← Back to Brain Section</a>
+      </p>
+
+    </div>
+  </article>
+
+  <div class="glow-orb purple" style="width:500px;height:500px;top:15%;left:-12%;"></div>
+  <div class="glow-orb pink" style="width:400px;height:400px;bottom:20%;right:-10%;"></div>
+
+  <footer class="footer">
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="deep-learning.html">Deep Learning</a>
+      <a href="brain.html">Brain</a>
+      <a href="universe.html">Universe</a>
+    </div>
+    <p>&copy; 2026 Deep Blog. Built with curiosity and caffeine.</p>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/neurons.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof katex !== 'undefined') {
+        setTimeout(function() {
+          document.querySelectorAll('.math-block[data-math]').forEach(function(el) {
+            katex.render(el.getAttribute('data-math'), el, { displayMode: true, throwOnError: false });
+          });
+          document.querySelectorAll('.inline-math[data-math]').forEach(function(el) {
+            katex.render(el.getAttribute('data-math'), el, { displayMode: false, throwOnError: false });
+          });
+        }, 100);
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quantum Mechanics: The Rules of Reality — Deep Blog</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+</head>
+<body>
+
+  <div class="scroll-progress" id="scrollProgress"></div>
+
+  <!-- Table of Contents (left sidebar) -->
+  <div class="toc" id="toc">
+    <a href="#intro" data-label="Introduction" class="active"></a>
+    <a href="#classical-crisis" data-label="Classical Crisis"></a>
+    <a href="#quantization" data-label="Quantization"></a>
+    <a href="#wave-particle" data-label="Wave-Particle Duality"></a>
+    <a href="#demo-doubleslit" data-label="Double-Slit Demo"></a>
+    <a href="#wavefunction" data-label="The Wave Function"></a>
+    <a href="#superposition" data-label="Superposition"></a>
+    <a href="#uncertainty" data-label="Uncertainty Principle"></a>
+    <a href="#demo-uncertainty" data-label="Uncertainty Demo"></a>
+    <a href="#tunneling" data-label="Quantum Tunneling"></a>
+    <a href="#demo-tunneling" data-label="Tunneling Demo"></a>
+    <a href="#entanglement" data-label="Entanglement"></a>
+    <a href="#measurement" data-label="Measurement Problem"></a>
+    <a href="#code" data-label="Code"></a>
+    <a href="#conclusion" data-label="Conclusion"></a>
+  </div>
+
+  <nav class="navbar" id="navbar">
+    <a href="index.html" class="nav-brand">⟨deep/blog⟩</a>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="deep-learning.html">Deep Learning</a></li>
+      <li><a href="brain.html">Brain</a></li>
+      <li><a href="universe.html" class="active">Universe</a></li>
+    </ul>
+  </nav>
+
+  <!-- Blog Hero -->
+  <section class="blog-hero">
+    <canvas class="hero-canvas" id="quantumHeroCanvas"></canvas>
+    <div class="blog-hero-content">
+      <div class="hero-badge" style="background: rgba(244,114,182,0.08); border-color: rgba(244,114,182,0.2); color: var(--accent-pink);">
+        <span class="dot" style="background: var(--accent-pink);"></span>
+        Quantum Physics
+      </div>
+      <h1>Quantum Mechanics:<br><span class="gradient-text">The Rules of Reality</span></h1>
+      <p style="color: var(--text-secondary); font-size: 1.15rem; max-width: 650px; margin: 0 auto 1.5rem;">
+        Wave-particle duality, superposition, entanglement, and the measurement problem — the fundamental theory that governs everything, explained with interactive simulations.
+      </p>
+      <div class="blog-meta">
+        <span>📅 March 2026</span>
+        <span>⏱ 45 min read</span>
+        <span>📊 Beginner → Intermediate</span>
+      </div>
+    </div>
+    <div class="hero-overlay"></div>
+  </section>
+
+  <!-- Blog Content -->
+  <article class="blog-article">
+    <div class="container-narrow">
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           1. INTRODUCTION
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="intro">1. Introduction — Why Quantum Mechanics?</h2>
+
+      <p>At the turn of the 20th century, physics was in crisis. Classical mechanics — the elegant framework of Newton, Maxwell, and Boltzmann — had explained everything from planetary orbits to steam engines with extraordinary precision. Many physicists believed that the fundamental laws of nature were essentially <strong>complete</strong>. Lord Kelvin famously remarked that physics had only "two small clouds" left to resolve.</p>
+
+      <p>Those two clouds turned out to be <strong>hurricanes</strong>. One led to <strong>relativity</strong>. The other led to <strong>quantum mechanics</strong> — a theory so radical, so counterintuitive, and so spectacularly successful that it has reshaped our understanding of reality itself.</p>
+
+      <div class="callout insight">
+        <div class="callout-title">Core Intuition</div>
+        <p>Quantum mechanics tells us that at the deepest level, nature is not deterministic — it is <strong>probabilistic</strong>. Particles don't have definite positions until they're measured. They can be in multiple states simultaneously. And observing a system fundamentally changes it. The universe, at its core, plays dice.</p>
+      </div>
+
+      <p>Quantum mechanics is not just an abstract theory for physicists. It is the foundation of:</p>
+
+      <ul>
+        <li><strong>All of chemistry</strong> — bonding, reactions, the periodic table</li>
+        <li><strong>All of electronics</strong> — semiconductors, transistors, the entire digital age</li>
+        <li><strong>Lasers, MRI machines, GPS, nuclear energy</strong></li>
+        <li><strong>Quantum computing</strong> — the next computational revolution</li>
+        <li>Potentially: <strong>consciousness itself</strong> (still debated)</li>
+      </ul>
+
+      <p>In this article, we'll build quantum mechanics from the ground up — starting with the experiments that shattered classical physics, through the mathematical framework of wave functions and operators, to the deepest mysteries of measurement and entanglement. Along the way, you'll interact with simulations that let you fire particles through slits, explore the uncertainty principle, and watch quantum tunneling in action.</p>
+
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           2. THE CLASSICAL CRISIS
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="classical-crisis">2. The Classical Crisis — Five Experiments That Broke Physics</h2>
+
+      <p>Classical physics made predictions that flatly contradicted experimental observations at the atomic scale. Here are the five key experiments that forced physicists to rethink everything.</p>
+
+      <h3>2.1 Black-Body Radiation & the Ultraviolet Catastrophe</h3>
+
+      <p>A hot object emits electromagnetic radiation. Classical physics (the Rayleigh-Jeans law) predicted that the intensity should increase without limit at short wavelengths — that any hot object should emit <strong>infinite energy</strong> in ultraviolet light. This absurd prediction was called the <strong>ultraviolet catastrophe</strong>.</p>
+
+      <p>In 1900, <strong>Max Planck</strong> resolved this by proposing a radical idea: energy isn't emitted continuously but in discrete packets — <strong>quanta</strong>. The energy of each quantum is:</p>
+
+      <div class="math-block" data-math="E = h\nu"></div>
+
+      <p>where <span class="inline-math" data-math="h = 6.626 \times 10^{-34}\,\text{J·s}"></span> is <strong>Planck's constant</strong> — possibly the most important number in physics — and <span class="inline-math" data-math="\nu"></span> is the frequency of the radiation. This single equation launched the quantum revolution.</p>
+
+      <h3>2.2 The Photoelectric Effect</h3>
+
+      <p>When light shines on a metal surface, electrons are ejected. Classical wave theory predicted that brighter light (more energy) should eject electrons with more energy. But the experiments showed something bizarre:</p>
+
+      <ul>
+        <li>Below a <strong>threshold frequency</strong>, no electrons are ejected — regardless of intensity</li>
+        <li>Above threshold, electron energy depends on <strong>frequency</strong>, not intensity</li>
+        <li>Brighter light ejects <strong>more</strong> electrons but doesn't increase their energy</li>
+      </ul>
+
+      <p>In 1905, <strong>Einstein</strong> explained this by extending Planck's idea: light itself comes in discrete packets — <strong>photons</strong>. Each photon carries energy <span class="inline-math" data-math="E = h\nu"></span>. The maximum kinetic energy of an ejected electron is:</p>
+
+      <div class="math-block" data-math="K_{\max} = h\nu - \phi"></div>
+
+      <p>where <span class="inline-math" data-math="\phi"></span> is the work function (the minimum energy needed to free an electron from the metal). This earned Einstein the 1921 Nobel Prize — notably <em>not</em> for relativity, but for quantum physics.</p>
+
+      <h3>2.3 Atomic Line Spectra</h3>
+
+      <p>When hydrogen gas is heated, it emits light at only <strong>specific discrete wavelengths</strong> — not a continuous rainbow. The Rydberg formula described the pattern empirically:</p>
+
+      <div class="math-block" data-math="\frac{1}{\lambda} = R_\infty \left(\frac{1}{n_1^2} - \frac{1}{n_2^2}\right)"></div>
+
+      <p>But nobody could explain <em>why</em>. In 1913, <strong>Niels Bohr</strong> proposed that electrons orbit the nucleus only in specific allowed orbits, with quantized angular momentum <span class="inline-math" data-math="L = n\hbar"></span>. Transitions between orbits emit or absorb photons at specific frequencies. It worked perfectly for hydrogen — but couldn't explain helium or anything more complex.</p>
+
+      <h3>2.4 The Compton Effect</h3>
+
+      <p>In 1923, <strong>Arthur Compton</strong> scattered X-rays off electrons and found that the wavelength of the scattered X-ray was <strong>longer</strong> than the incident one — the X-ray lost energy. This only made sense if the X-ray photon behaved like a <strong>particle</strong> with momentum:</p>
+
+      <div class="math-block" data-math="p = \frac{h}{\lambda}"></div>
+
+      <p>Light wasn't just a wave. It had particle-like momentum. The wave-particle duality was becoming undeniable.</p>
+
+      <h3>2.5 The Stern-Gerlach Experiment</h3>
+
+      <p>In 1922, silver atoms were sent through an inhomogeneous magnetic field. Classically, the atoms should spread out continuously. Instead, they split into exactly <strong>two distinct beams</strong> — revealing that angular momentum (spin) is quantized, taking only discrete values. This was the first direct observation of quantum spin.</p>
+
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           3. QUANTIZATION — ENERGY COMES IN PACKETS
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="quantization">3. Quantization — Energy Comes in Packets</h2>
+
+      <p>The common thread through all these experiments is <strong>discreteness</strong>. Quantities that classical physics assumed to be continuous — energy, angular momentum, spin — turn out to come in discrete packets at the atomic scale.</p>
+
+      <h3>3.1 The Hydrogen Atom Energy Levels</h3>
+
+      <p>The allowed energies of an electron in a hydrogen atom are:</p>
+
+      <div class="math-block" data-math="E_n = -\frac{13.6\,\text{eV}}{n^2}, \quad n = 1, 2, 3, \ldots"></div>
+
+      <p>The electron cannot have an energy of, say, −10 eV. It must be −13.6 eV (n=1), −3.4 eV (n=2), −1.51 eV (n=3), and so on. The gaps between levels produce the discrete spectral lines we observe.</p>
+
+      <h3>3.2 The Quantum Harmonic Oscillator</h3>
+
+      <p>A mass on a spring (or any vibrating system) has quantized energies:</p>
+
+      <div class="math-block" data-math="E_n = \hbar\omega\left(n + \frac{1}{2}\right), \quad n = 0, 1, 2, \ldots"></div>
+
+      <p>where <span class="inline-math" data-math="\omega"></span> is the oscillation frequency. The remarkable <span class="inline-math" data-math="\frac{1}{2}\hbar\omega"></span> term is the <strong>zero-point energy</strong> — even at absolute zero temperature, a quantum oscillator cannot be perfectly still. This is a direct consequence of the uncertainty principle, which we'll explore soon.</p>
+
+      <div class="callout key">
+        <div class="callout-title">Key Concept: Quantization</div>
+        <p>At the microscopic scale, physical quantities are <strong>quantized</strong> — they come in discrete indivisible chunks. Energy, angular momentum, and spin all take only specific allowed values. This is the fundamental departure from classical physics, where all quantities were assumed to be continuous.</p>
+      </div>
+
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           4. WAVE-PARTICLE DUALITY
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="wave-particle">4. Wave-Particle Duality — The Nature of Quantum Objects</h2>
+
+      <p>Perhaps the most mind-bending aspect of quantum mechanics is that every quantum object — photons, electrons, atoms — exhibits <strong>both wave-like and particle-like behavior</strong>. Which aspect you observe depends on how you look.</p>
+
+      <h3>4.1 de Broglie's Hypothesis</h3>
+
+      <p>In 1924, <strong>Louis de Broglie</strong> made a breathtaking leap of logic. If light (a wave) can behave like a particle (photons), then perhaps particles (like electrons) can behave like waves. He proposed that every particle has an associated wavelength:</p>
+
+      <div class="math-block" data-math="\lambda = \frac{h}{p} = \frac{h}{mv}"></div>
+
+      <p>For a baseball (m = 0.15 kg, v = 40 m/s), <span class="inline-math" data-math="\lambda \approx 10^{-34}"></span> m — far too small to ever detect. But for an electron moving at 1% of the speed of light, <span class="inline-math" data-math="\lambda \approx 0.24"></span> nm — comparable to atomic spacings. Electron waves should produce <strong>diffraction patterns</strong> when passing through crystal lattices.</p>
+
+      <p>This was confirmed experimentally in 1927 by <strong>Davisson and Germer</strong>, who observed electron diffraction from a nickel crystal. de Broglie received the Nobel Prize in 1929.</p>
+
+      <h3>4.2 The Double-Slit Experiment</h3>
+
+      <p>Richard Feynman called it "the only mystery" of quantum mechanics. The double-slit experiment encapsulates the full strangeness of wave-particle duality in a single setup:</p>
+
+      <div class="steps">
+        <div class="step">
+          <p><strong>Setup:</strong> A source fires particles (photons, electrons, or even molecules) toward a barrier with two narrow slits. A detector screen sits behind the barrier.</p>
+        </div>
+        <div class="step">
+          <p><strong>Many particles, both slits open:</strong> The particles build up an <strong>interference pattern</strong> — alternating bright and dark bands. This is characteristic of <strong>waves</strong>. The waves from each slit interfere constructively (bright) and destructively (dark).</p>
+        </div>
+        <div class="step">
+          <p><strong>One particle at a time:</strong> Even when particles are sent <em>one by one</em>, the interference pattern <em>still builds up</em> over time. Each individual particle goes through the apparatus and hits the screen at a single point (particle behavior), but the <em>probability distribution</em> of where it hits follows the wave interference pattern.</p>
+        </div>
+        <div class="step">
+          <p><strong>Which-path detection:</strong> If you add a detector to determine which slit the particle went through, the interference pattern <strong>vanishes</strong>. You get two simple bands — one behind each slit. <strong>The act of observing destroys the interference.</strong></p>
+        </div>
+      </div>
+
+      <div class="callout warning">
+        <div class="callout-title">The Deep Mystery</div>
+        <p>The particle seems to go through <strong>both slits simultaneously</strong> when unobserved, creating interference with itself. But when you check which slit it went through, it behaves as if it went through only one. The quantum object is neither purely a wave nor purely a particle — it's something new that has no classical analogue. The math tells us to stop asking "what is it really?" and instead ask "what will I observe?"</p>
+      </div>
+
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           5. INTERACTIVE: DOUBLE-SLIT EXPERIMENT
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="demo-doubleslit">5. Interactive: Double-Slit Experiment</h2>
+
+      <p>In this simulation, particles are fired one at a time toward a barrier with two slits. Watch the interference pattern emerge on the detector screen as particles accumulate. Toggle the "which-path detector" to see the interference vanish.</p>
+
+      <div class="interactive-section">
+        <h4>Double-Slit Experiment Simulator</h4>
+        <p class="subtitle">Particles fire one at a time. Watch the wave-like interference pattern build up. Toggle the detector to collapse the wave function.</p>
+        <div class="canvas-container" style="height: 420px;" id="doubleSlitContainer">
+          <canvas id="doubleSlitCanvas"></canvas>
+        </div>
+        <div class="controls">
+          <label>Particle Rate:</label>
+          <input type="range" id="dsRate" min="1" max="20" step="1" value="5">
+          <span class="value-display" id="dsRateVal">5/frame</span>
+          <label>Slit Width:</label>
+          <input type="range" id="dsSlitWidth" min="5" max="40" step="1" value="15">
+          <span class="value-display" id="dsSlitWidthVal">15</span>
+          <button id="dsDetector" style="background: rgba(248,113,113,0.08); border-color: rgba(248,113,113,0.25); color: var(--accent-red);">🔍 Detector: OFF</button>
+          <button id="dsReset">↺ Reset</button>
+        </div>
+        <div class="sampler-legend">
+          <span class="legend-item" style="--legend-color: #00d4ff;">● Particles</span>
+          <span class="legend-item" style="--legend-color: #7c3aed;">● Detection Screen Hits</span>
+          <span class="legend-item" style="--legend-color: #f472b6;">● Intensity Distribution</span>
+        </div>
+      </div>
+
+      <h3>5.1 What to Observe</h3>
+
+      <ul>
+        <li><strong>Detector OFF:</strong> The distribution shows multiple peaks — an interference pattern. More particles cluster at certain positions than others.</li>
+        <li><strong>Detector ON:</strong> The distribution collapses to two simple peaks — one behind each slit. No interference.</li>
+        <li><strong>Narrow slits:</strong> Wider interference pattern (more diffraction). Wider slits → pattern shrinks.</li>
+        <li><strong>Single particle:</strong> Each particle hits a single random spot, but over many particles the wave pattern emerges. The wave function governs probabilities, not trajectories.</li>
+      </ul>
+
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           6. THE WAVE FUNCTION
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="wavefunction">6. The Wave Function — The Heart of Quantum Mechanics</h2>
+
+      <p>If quantum objects behave like waves, what exactly is waving? The answer is the <strong>wave function</strong>, denoted <span class="inline-math" data-math="\Psi(x, t)"></span> — a complex-valued function that encodes everything knowable about a quantum system.</p>
+
+      <h3>6.1 The Schrödinger Equation</h3>
+
+      <p>In 1925, <strong>Erwin Schrödinger</strong> wrote down the equation that governs how the wave function evolves in time — the quantum equivalent of Newton's <span class="inline-math" data-math="F = ma"></span>:</p>
+
+      <div class="math-block" data-math="i\hbar \frac{\partial \Psi}{\partial t} = -\frac{\hbar^2}{2m}\frac{\partial^2 \Psi}{\partial x^2} + V(x)\,\Psi"></div>
+
+      <p>Or in compact notation using the Hamiltonian operator:</p>
+
+      <div class="math-block" data-math="i\hbar \frac{\partial \Psi}{\partial t} = \hat{H}\Psi"></div>
+
+      <p>This is a <strong>deterministic</strong> equation — given the wave function at one time, you can compute it at any future time with perfect precision. The randomness of quantum mechanics enters not in the evolution, but in the <strong>measurement</strong>.</p>
+
+      <h3>6.2 The Born Rule — Probability from Amplitudes</h3>
+
+      <p><strong>Max Born</strong> (1926) provided the physical interpretation: the wave function itself has no direct physical meaning, but its <strong>squared magnitude</strong> gives the probability density of finding the particle at position x:</p>
+
+      <div class="math-block" data-math="P(x)\,dx = |\Psi(x,t)|^2\,dx"></div>
+
+      <p>Since the particle must be <em>somewhere</em>, the total probability must equal 1:</p>
+
+      <div class="math-block" data-math="\int_{-\infty}^{+\infty} |\Psi(x,t)|^2\,dx = 1"></div>
+
+      <p>The wave function is a <strong>probability amplitude</strong>. Amplitudes can interfere (add constructively or destructively) — this is the mathematical origin of the interference patterns in the double-slit experiment.</p>
+
+      <h3>6.3 Complex Numbers Are Essential</h3>
+
+      <p>The wave function is <strong>complex-valued</strong> — it has both a real and imaginary part, or equivalently an amplitude and a phase:</p>
+
+      <div class="math-block" data-math="\Psi(x,t) = |\Psi(x,t)|\,e^{i\phi(x,t)}"></div>
+
+      <p>The phase <span class="inline-math" data-math="\phi"></span> has no classical analogue, but it is crucial: interference depends on the relative phases of different wave function components. When two paths have the same phase, they interfere constructively (bright fringes). When they differ by π, they cancel (dark fringes).</p>
+
+      <div class="callout key">
+        <div class="callout-title">Key Concept: Wave Function</div>
+        <p>The wave function <span class="inline-math" data-math="\Psi(x,t)"></span> is a complex-valued probability amplitude. It evolves deterministically via the Schrödinger equation, but when a measurement is made, the outcome is <strong>random</strong> — governed by <span class="inline-math" data-math="|\Psi|^2"></span>. The wave function is the most complete description of a quantum system that nature allows.</p>
+      </div>
+
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           7. SUPERPOSITION
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="superposition">7. Superposition — Being in Multiple States at Once</h2>
+
+      <p>The Schrödinger equation is <strong>linear</strong>. This means that if <span class="inline-math" data-math="\Psi_1"></span> and <span class="inline-math" data-math="\Psi_2"></span> are both valid solutions, then any linear combination is also a valid solution:</p>
+
+      <div class="math-block" data-math="\Psi = \alpha\,\Psi_1 + \beta\,\Psi_2, \quad |\alpha|^2 + |\beta|^2 = 1"></div>
+
+      <p>This is the <strong>superposition principle</strong> — a quantum system can exist in a combination of multiple states simultaneously. An electron can be in a superposition of "spin up" and "spin down." A photon can be in a superposition of "going through slit 1" and "going through slit 2." Schrödinger's cat (a thought experiment) can be in a superposition of alive and dead.</p>
+
+      <h3>7.1 Measurement and Collapse</h3>
+
+      <p>When you measure a property of a quantum system, the superposition <strong>collapses</strong> — the system "chooses" one of its possible states with probability given by the Born rule:</p>
+
+      <div class="math-block" data-math="P(\text{outcome } i) = |\langle \phi_i | \Psi \rangle|^2"></div>
+
+      <p>After the measurement, the system is left in the state corresponding to the observed outcome. This is the famous <strong>collapse of the wave function</strong> — the most contentious concept in all of physics.</p>
+
+      <h3>7.2 Dirac Notation</h3>
+
+      <p>Physicists use a compact notation invented by Paul Dirac. A quantum state is written as a <strong>ket</strong>: <span class="inline-math" data-math="|\psi\rangle"></span>. A superposition of spin states looks like:</p>
+
+      <div class="math-block" data-math="|\psi\rangle = \frac{1}{\sqrt{2}}|\!\uparrow\rangle + \frac{1}{\sqrt{2}}|\!\downarrow\rangle"></div>
+
+      <p>This state has equal probability of being measured as spin-up or spin-down. Before measurement, it is <strong>neither</strong> — it is in a genuine superposition of both.</p>
+
+      <h3>7.3 Schrödinger's Cat</h3>
+
+      <p>Schrödinger proposed his famous thought experiment in 1935 not to support quantum mechanics but to expose what he saw as its <strong>absurdity</strong>. A cat is placed in a box with a vial of poison triggered by a radioactive atom. If the atom decays (quantum event), the poison is released and the cat dies. After one half-life:</p>
+
+      <div class="math-block" data-math="|\text{system}\rangle = \frac{1}{\sqrt{2}}|\text{undecayed}\rangle|\text{alive}\rangle + \frac{1}{\sqrt{2}}|\text{decayed}\rangle|\text{dead}\rangle"></div>
+
+      <p>Quantum mechanics says the cat is in a superposition of alive and dead until the box is opened. This seems absurd for a macroscopic object — and understanding <em>why</em> we never observe macroscopic superpositions is the heart of the measurement problem (Section 13).</p>
+
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           8. THE UNCERTAINTY PRINCIPLE
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="uncertainty">8. The Uncertainty Principle — Fundamental Limits of Knowledge</h2>
+
+      <p>In 1927, <strong>Werner Heisenberg</strong> discovered that certain pairs of physical properties cannot both be known precisely at the same time. This is not a limitation of our instruments — it is a fundamental property of nature.</p>
+
+      <h3>8.1 Position and Momentum</h3>
+
+      <p>The most famous uncertainty relation involves position and momentum:</p>
+
+      <div class="math-block" data-math="\Delta x \cdot \Delta p \geq \frac{\hbar}{2}"></div>
+
+      <p>where <span class="inline-math" data-math="\Delta x"></span> is the uncertainty (standard deviation) in position, <span class="inline-math" data-math="\Delta p"></span> is the uncertainty in momentum, and <span class="inline-math" data-math="\hbar = h/2\pi \approx 1.055 \times 10^{-34}"></span> J·s.</p>
+
+      <p>This means: the more precisely you know a particle's position, the <strong>less</strong> you can know about its momentum, and vice versa. If you pinpoint the position perfectly (<span class="inline-math" data-math="\Delta x = 0"></span>), the momentum becomes completely unknown (<span class="inline-math" data-math="\Delta p = \infty"></span>).</p>
+
+      <h3>8.2 Why It's Not About Measurement Disturbance</h3>
+
+      <p>A common misconception is that the uncertainty principle arises because measuring one property "disturbs" the other. While this is sometimes true, the uncertainty principle is much deeper. It arises from the <strong>wave nature</strong> of quantum objects:</p>
+
+      <ul>
+        <li>A wave with a well-defined <strong>wavelength</strong> (definite momentum <span class="inline-math" data-math="p = h/\lambda"></span>) extends over all space — its position is completely undefined.</li>
+        <li>A wave <strong>localized</strong> in space (definite position) must be a superposition of many wavelengths — its momentum is undefined.</li>
+      </ul>
+
+      <p>This is a mathematical fact about <strong>Fourier transforms</strong>: a function and its Fourier transform cannot both be sharply peaked. Uncertainty is built into the mathematics of waves.</p>
+
+      <h3>8.3 Energy-Time Uncertainty</h3>
+
+      <p>There is also an energy-time uncertainty relation:</p>
+
+      <div class="math-block" data-math="\Delta E \cdot \Delta t \geq \frac{\hbar}{2}"></div>
+
+      <p>This has profound consequences: for very short times (<span class="inline-math" data-math="\Delta t"></span> small), the energy of a system can fluctuate enormously (<span class="inline-math" data-math="\Delta E"></span> large). This allows "virtual particles" to briefly pop into existence from the vacuum — the basis of <strong>quantum field theory</strong> and <strong>Hawking radiation</strong>.</p>
+
+      <div class="callout insight">
+        <div class="callout-title">Not Ignorance, But Reality</div>
+        <p>The uncertainty principle is not about our <em>ignorance</em> of existing properties. The particle genuinely <strong>does not have</strong> a definite position and momentum simultaneously. This is one of the deepest lessons of quantum mechanics: asking "what is the particle's exact position?" when it has definite momentum is not a meaningful question. Some properties simply don't coexist in nature.</p>
+      </div>
+
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           9. INTERACTIVE: UNCERTAINTY PRINCIPLE
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="demo-uncertainty">9. Interactive: Uncertainty Principle Visualizer</h2>
+
+      <p>This simulation shows a quantum wave packet in position space (top) and its Fourier transform in momentum space (bottom). As you make the position distribution narrower, watch the momentum distribution get wider — and vice versa. The product Δx·Δp always stays at or above ℏ/2.</p>
+
+      <div class="interactive-section">
+        <h4>Position–Momentum Uncertainty</h4>
+        <p class="subtitle">Drag the slider to change the position spread (Δx). Watch the momentum spread (Δp) respond — they can never both be narrow.</p>
+        <div class="canvas-container" style="height: 380px;" id="uncertaintyContainer">
+          <canvas id="uncertaintyCanvas"></canvas>
+        </div>
+        <div class="controls">
+          <label>Position Spread (Δx):</label>
+          <input type="range" id="uncDx" min="5" max="80" step="1" value="30">
+          <span class="value-display" id="uncDxVal">Δx = 30</span>
+          <span class="value-display" id="uncProduct" style="color: var(--accent-pink);">Δx·Δp = ℏ/2</span>
+        </div>
+        <div class="sampler-legend">
+          <span class="legend-item" style="--legend-color: #00d4ff;">● |Ψ(x)|² — Position Probability</span>
+          <span class="legend-item" style="--legend-color: #f472b6;">● |Φ(p)|² — Momentum Probability</span>
+        </div>
+      </div>
+
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           10. QUANTUM TUNNELING
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="tunneling">10. Quantum Tunneling — Walking Through Walls</h2>
+
+      <p>In classical physics, if a ball doesn't have enough energy to roll over a hill, it bounces back. Period. In quantum mechanics, there is a non-zero probability that a particle can pass <strong>through</strong> an energy barrier that it classically could not surmount. This is <strong>quantum tunneling</strong>.</p>
+
+      <h3>10.1 How It Works</h3>
+
+      <p>When a wave function encounters a potential barrier higher than the particle's energy, it doesn't abruptly stop. Instead, it <strong>decays exponentially</strong> inside the barrier:</p>
+
+      <div class="math-block" data-math="\Psi(x) \propto e^{-\kappa x}, \quad \kappa = \frac{\sqrt{2m(V_0 - E)}}{\hbar}"></div>
+
+      <p>If the barrier is thin enough, the wave function hasn't decayed to zero by the time it reaches the other side — there is a non-zero amplitude (and therefore probability) for the particle to appear on the far side. The transmission probability for a rectangular barrier is approximately:</p>
+
+      <div class="math-block" data-math="T \approx e^{-2\kappa L}"></div>
+
+      <p>where <span class="inline-math" data-math="L"></span> is the barrier width. This probability drops exponentially with barrier width and height.</p>
+
+      <h3>10.2 Real-World Tunneling</h3>
+
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Phenomenon</th>
+            <th>What Tunnels</th>
+            <th>Significance</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Alpha decay</strong></td>
+            <td>Alpha particles through nuclear potential barrier</td>
+            <td>Explains radioactive half-lives spanning 10⁰ to 10¹⁷ years</td>
+          </tr>
+          <tr>
+            <td><strong>Nuclear fusion in stars</strong></td>
+            <td>Protons through Coulomb barrier</td>
+            <td>The Sun shines because of tunneling — classically it's too cold</td>
+          </tr>
+          <tr>
+            <td><strong>Scanning Tunneling Microscope</strong></td>
+            <td>Electrons through vacuum gap</td>
+            <td>Images individual atoms — Nobel Prize 1986</td>
+          </tr>
+          <tr>
+            <td><strong>Tunnel diode</strong></td>
+            <td>Electrons through thin semiconductor barrier</td>
+            <td>Used in high-frequency electronics</td>
+          </tr>
+          <tr>
+            <td><strong>Flash memory</strong></td>
+            <td>Electrons through oxide layer</td>
+            <td>How your SSD stores data</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout insight">
+        <div class="callout-title">Stars Shine Because of Tunneling</div>
+        <p>At the core of the Sun, the temperature is ~15 million K. But the Coulomb barrier between two protons requires an equivalent temperature of ~10 <strong>billion</strong> K to overcome classically. The Sun is roughly 1,000× too cold for fusion to happen classically. It works only because quantum tunneling allows protons to pass through the barrier with a tiny but non-zero probability. Every photon of sunlight exists because of quantum mechanics.</p>
+      </div>
+
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           11. INTERACTIVE: QUANTUM TUNNELING
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="demo-tunneling">11. Interactive: Quantum Tunneling Simulator</h2>
+
+      <p>Watch a wave packet approach a potential barrier. The wave function decays inside the barrier but doesn't vanish — part of it emerges on the other side. Adjust the barrier height and width to see how the transmission probability changes.</p>
+
+      <div class="interactive-section">
+        <h4>Quantum Tunneling</h4>
+        <p class="subtitle">A Gaussian wave packet hits a rectangular barrier. Watch the reflected and transmitted components. Thinner/lower barriers → more tunneling.</p>
+        <div class="canvas-container" style="height: 350px;" id="tunnelingContainer">
+          <canvas id="tunnelingCanvas"></canvas>
+        </div>
+        <div class="controls">
+          <label>Barrier Height:</label>
+          <input type="range" id="tunBarrier" min="20" max="100" step="1" value="60">
+          <span class="value-display" id="tunBarrierVal">60%</span>
+          <label>Barrier Width:</label>
+          <input type="range" id="tunWidth" min="5" max="60" step="1" value="25">
+          <span class="value-display" id="tunWidthVal">25 px</span>
+          <button id="tunFire">🚀 Fire Packet</button>
+          <button id="tunReset">↺ Reset</button>
+        </div>
+        <div class="sampler-legend">
+          <span class="legend-item" style="--legend-color: #00d4ff;">● |Ψ(x)|² Wave Packet</span>
+          <span class="legend-item" style="--legend-color: rgba(124,58,237,0.5);">█ Potential Barrier V(x)</span>
+          <span class="legend-item" style="--legend-color: #34d399;">● Transmitted Portion</span>
+        </div>
+      </div>
+
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           12. ENTANGLEMENT
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="entanglement">12. Quantum Entanglement — Spooky Action at a Distance</h2>
+
+      <p>When two quantum particles interact, they can become <strong>entangled</strong> — their quantum states become correlated in a way that has no classical explanation. Measuring one particle instantly determines the state of the other, regardless of the distance between them.</p>
+
+      <h3>12.1 The EPR Paradox</h3>
+
+      <p>In 1935, Einstein, Podolsky, and Rosen (EPR) proposed a thought experiment to argue that quantum mechanics was <strong>incomplete</strong>. Consider two particles created in the entangled spin state:</p>
+
+      <div class="math-block" data-math="|\Psi\rangle = \frac{1}{\sqrt{2}}\left(|\!\uparrow\rangle_A|\!\downarrow\rangle_B - |\!\downarrow\rangle_A|\!\uparrow\rangle_B\right)"></div>
+
+      <p>This is called a <strong>Bell state</strong> (or singlet state). Neither particle has a definite spin on its own. But if you measure particle A and find spin-up, you instantly know particle B is spin-down — even if B is on the other side of the galaxy.</p>
+
+      <p>Einstein called this "spooky action at a distance" and argued that the particles must have carried pre-determined values (hidden variables) all along. Quantum mechanics just didn't know about them.</p>
+
+      <h3>12.2 Bell's Theorem (1964)</h3>
+
+      <p><strong>John Bell</strong> proved mathematically that if hidden variables exist, the correlations between entangled particles must satisfy a set of inequalities — the <strong>Bell inequalities</strong>:</p>
+
+      <div class="math-block" data-math="|E(a,b) - E(a,c)| \leq 1 + E(b,c)"></div>
+
+      <p>Quantum mechanics predicts that these inequalities are <strong>violated</strong>. Starting with Alain Aspect's experiments in 1982, and culminating in loophole-free tests in 2015 (Nobel Prize 2022 to Aspect, Clauser, and Zeilinger), experiments have conclusively confirmed: <strong>Bell's inequalities are violated. Nature is not locally realistic.</strong></p>
+
+      <h3>12.3 What Entanglement Is Not</h3>
+
+      <p>Despite the "spooky" label, entanglement does <strong>not</strong> allow faster-than-light communication. The individual measurement outcomes are still random — you can't control what you get. The correlations only become apparent when the two experimenters <strong>compare</strong> their results (which requires classical communication). Entanglement violates <strong>local realism</strong>, not <strong>causality</strong>.</p>
+
+      <h3>12.4 Entanglement as a Resource</h3>
+
+      <p>Far from being just a philosophical curiosity, entanglement is now recognized as a <strong>physical resource</strong> that enables:</p>
+
+      <ul>
+        <li><strong>Quantum teleportation</strong> — transmitting a quantum state using entanglement + 2 classical bits</li>
+        <li><strong>Quantum key distribution</strong> — provably secure cryptography</li>
+        <li><strong>Quantum computing</strong> — entanglement is what gives quantum computers their exponential advantage for certain problems</li>
+        <li><strong>Quantum sensors</strong> — entangled particles enable measurements below the classical noise limit</li>
+      </ul>
+
+      <div class="callout key">
+        <div class="callout-title">Entanglement in One Sentence</div>
+        <p>Entangled particles share a quantum state such that measuring one instantaneously constrains the other — not because information is traveling, but because <strong>they were never truly separate</strong>. They are described by a single wave function, no matter how far apart.</p>
+      </div>
+
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           13. THE MEASUREMENT PROBLEM
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="measurement">13. The Measurement Problem — Interpretations of Quantum Mechanics</h2>
+
+      <p>Quantum mechanics is extraordinarily successful at <em>predicting</em> experimental outcomes. But it leaves a deep question unanswered: <strong>what actually happens when a measurement is made?</strong> Why does the wave function "collapse"? What counts as a "measurement"? This is the <strong>measurement problem</strong>, and it has spawned multiple competing interpretations.</p>
+
+      <h3>13.1 Copenhagen Interpretation</h3>
+
+      <p>The standard textbook interpretation, associated with Bohr and Heisenberg. It asserts that the wave function doesn't describe reality — it describes our <strong>knowledge</strong> of reality. Upon measurement, the wave function collapses to the observed eigenstate. The collapse is not a physical process but an update of information.</p>
+
+      <p><strong>Pros:</strong> Pragmatic, gives correct predictions, widely taught.<br>
+      <strong>Cons:</strong> Doesn't explain <em>what</em> a measurement is. Requires an arbitrary quantum/classical divide.</p>
+
+      <h3>13.2 Many-Worlds Interpretation</h3>
+
+      <p>Proposed by <strong>Hugh Everett III</strong> in 1957. There is no collapse — the wave function <em>always</em> evolves unitarily via the Schrödinger equation. When a "measurement" occurs, the universe <strong>branches</strong>: every possible outcome occurs in a separate branch of reality. The observer in each branch sees only their outcome.</p>
+
+      <div class="math-block" data-math="|\text{observer}\rangle|\psi\rangle \to \alpha|\text{observer sees up}\rangle|\!\uparrow\rangle + \beta|\text{observer sees down}\rangle|\!\downarrow\rangle"></div>
+
+      <p><strong>Pros:</strong> No collapse postulate, elegant, deterministic at the universal level.<br>
+      <strong>Cons:</strong> Implies a vast (infinite?) number of unobservable parallel worlds. Probability interpretation is debated.</p>
+
+      <h3>13.3 Decoherence</h3>
+
+      <p>While not a full interpretation, <strong>decoherence theory</strong> explains <em>why</em> macroscopic superpositions are never observed. When a quantum system interacts with its environment (air molecules, photons, thermal radiation), the relative phases of different superposition components become <strong>randomized</strong> extremely quickly (on timescales of ~10⁻²⁰ seconds for macroscopic objects). This effectively destroys interference without needing a collapse postulate.</p>
+
+      <p>Decoherence explains the transition from quantum to classical behavior, but it doesn't solve the measurement problem completely — it doesn't explain why we observe <em>one particular</em> outcome.</p>
+
+      <h3>13.4 Other Interpretations</h3>
+
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Interpretation</th>
+            <th>Collapse?</th>
+            <th>Key Idea</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Pilot Wave (Bohm)</strong></td>
+            <td>No</td>
+            <td>Particles have definite positions guided by the wave function. Deterministic but nonlocal.</td>
+          </tr>
+          <tr>
+            <td><strong>QBism</strong></td>
+            <td>Subjective</td>
+            <td>Wave function represents an agent's personal beliefs. Physics is about experience, not reality.</td>
+          </tr>
+          <tr>
+            <td><strong>Objective Collapse (GRW)</strong></td>
+            <td>Physical</td>
+            <td>Spontaneous random collapses happen naturally — faster for larger systems. Testable.</td>
+          </tr>
+          <tr>
+            <td><strong>Relational (Rovelli)</strong></td>
+            <td>Relative</td>
+            <td>Quantum states are relative to the observer. No absolute state of affairs.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout warning">
+        <div class="callout-title">All Interpretations Give the Same Predictions</div>
+        <p>Every interpretation of quantum mechanics agrees on the <em>mathematics</em> and makes the same experimental predictions. They differ only in their <strong>ontology</strong> — what they claim about the nature of reality itself. This makes the choice between them partly a question of philosophy, not physics. Some physicists argue we should "shut up and calculate"; others insist the interpretation <em>matters</em> for guiding future research.</p>
+      </div>
+
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           14. CODE: QUANTUM SIMULATIONS
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="code">14. Code: Simulating Quantum Mechanics</h2>
+
+      <p>Here are Python implementations of key quantum simulations you can run yourself.</p>
+
+      <h3>14.1 Solving the Schrödinger Equation (1D)</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span>schrodinger_1d.py</span>
+        </div>
+        <pre><code><span class="token-keyword">import</span> <span class="token-variable">numpy</span> <span class="token-keyword">as</span> <span class="token-variable">np</span>
+
+<span class="token-keyword">def</span> <span class="token-function">evolve_wavepacket</span>(<span class="token-param">N</span>=<span class="token-number">512</span>, <span class="token-param">dx</span>=<span class="token-number">0.1</span>, <span class="token-param">dt</span>=<span class="token-number">0.005</span>,
+                       <span class="token-param">x0</span>=<span class="token-number">-15</span>, <span class="token-param">k0</span>=<span class="token-number">5</span>, <span class="token-param">sigma</span>=<span class="token-number">2.0</span>,
+                       <span class="token-param">V_height</span>=<span class="token-number">3.0</span>, <span class="token-param">V_width</span>=<span class="token-number">1.0</span>,
+                       <span class="token-param">steps</span>=<span class="token-number">2000</span>):
+    <span class="token-string">"""Evolve a Gaussian wave packet hitting a barrier
+    using the split-operator Fourier method."""</span>
+    x = np.<span class="token-function">linspace</span>(-N*dx/<span class="token-number">2</span>, N*dx/<span class="token-number">2</span>, N)
+    dk = <span class="token-number">2</span> * np.pi / (N * dx)
+    k = np.<span class="token-function">fft.fftfreq</span>(N, dx) * <span class="token-number">2</span> * np.pi
+
+    <span class="token-comment"># Gaussian wave packet</span>
+    psi = np.<span class="token-function">exp</span>(-(x - x0)**<span class="token-number">2</span> / (<span class="token-number">4</span>*sigma**<span class="token-number">2</span>)) * np.<span class="token-function">exp</span>(<span class="token-number">1j</span>*k0*x)
+    psi /= np.<span class="token-function">sqrt</span>(np.<span class="token-function">sum</span>(np.<span class="token-function">abs</span>(psi)**<span class="token-number">2</span>) * dx)
+
+    <span class="token-comment"># Rectangular barrier</span>
+    V = np.<span class="token-function">where</span>(np.<span class="token-function">abs</span>(x) < V_width/<span class="token-number">2</span>, V_height, <span class="token-number">0</span>)
+
+    <span class="token-comment"># Propagators</span>
+    expV = np.<span class="token-function">exp</span>(-<span class="token-number">1j</span> * V * dt / <span class="token-number">2</span>)
+    expK = np.<span class="token-function">exp</span>(-<span class="token-number">1j</span> * k**<span class="token-number">2</span> * dt / <span class="token-number">2</span>)
+
+    snapshots = [np.<span class="token-function">abs</span>(psi)**<span class="token-number">2</span>]
+    <span class="token-keyword">for</span> _ <span class="token-keyword">in</span> <span class="token-function">range</span>(steps):
+        psi *= expV
+        psi = np.fft.<span class="token-function">ifft</span>(expK * np.fft.<span class="token-function">fft</span>(psi))
+        psi *= expV
+        <span class="token-keyword">if</span> _ % <span class="token-number">100</span> == <span class="token-number">0</span>:
+            snapshots.<span class="token-function">append</span>(np.<span class="token-function">abs</span>(psi)**<span class="token-number">2</span>)
+
+    <span class="token-keyword">return</span> x, V, snapshots</code></pre>
+      </div>
+
+      <h3>14.2 Double-Slit Interference Pattern</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span>double_slit.py</span>
+        </div>
+        <pre><code><span class="token-keyword">import</span> <span class="token-variable">numpy</span> <span class="token-keyword">as</span> <span class="token-variable">np</span>
+<span class="token-keyword">import</span> <span class="token-variable">matplotlib.pyplot</span> <span class="token-keyword">as</span> <span class="token-variable">plt</span>
+
+<span class="token-keyword">def</span> <span class="token-function">double_slit_pattern</span>(<span class="token-param">d</span>=<span class="token-number">0.1e-3</span>, <span class="token-param">a</span>=<span class="token-number">0.02e-3</span>,
+                         <span class="token-param">wavelength</span>=<span class="token-number">500e-9</span>,
+                         <span class="token-param">L</span>=<span class="token-number">1.0</span>, <span class="token-param">N</span>=<span class="token-number">1000</span>):
+    <span class="token-string">"""Calculate the double-slit interference pattern.
+    d: slit separation, a: slit width,
+    wavelength: de Broglie wavelength, L: screen distance."""</span>
+    k = <span class="token-number">2</span> * np.pi / wavelength
+    y = np.<span class="token-function">linspace</span>(-<span class="token-number">0.01</span>, <span class="token-number">0.01</span>, N)
+    theta = y / L
+
+    <span class="token-comment"># Single slit envelope × double slit interference</span>
+    beta = k * a * np.<span class="token-function">sin</span>(theta) / <span class="token-number">2</span>
+    gamma = k * d * np.<span class="token-function">sin</span>(theta) / <span class="token-number">2</span>
+
+    single = np.<span class="token-function">sinc</span>(beta / np.pi)**<span class="token-number">2</span>
+    double = np.<span class="token-function">cos</span>(gamma)**<span class="token-number">2</span>
+    intensity = single * double
+
+    plt.<span class="token-function">figure</span>(figsize=(<span class="token-number">10</span>, <span class="token-number">4</span>))
+    plt.<span class="token-function">plot</span>(y * <span class="token-number">1e3</span>, intensity, color=<span class="token-string">'#00d4ff'</span>)
+    plt.<span class="token-function">fill_between</span>(y * <span class="token-number">1e3</span>, intensity, alpha=<span class="token-number">0.15</span>,
+                      color=<span class="token-string">'#00d4ff'</span>)
+    plt.<span class="token-function">xlabel</span>(<span class="token-string">'Screen Position (mm)'</span>)
+    plt.<span class="token-function">ylabel</span>(<span class="token-string">'Intensity'</span>)
+    plt.<span class="token-function">title</span>(<span class="token-string">'Double-Slit Interference Pattern'</span>)
+    plt.<span class="token-function">show</span>()</code></pre>
+      </div>
+
+      <h3>14.3 Quantum Tunneling Transmission Coefficient</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span>tunneling.py</span>
+        </div>
+        <pre><code><span class="token-keyword">import</span> <span class="token-variable">numpy</span> <span class="token-keyword">as</span> <span class="token-variable">np</span>
+
+<span class="token-keyword">def</span> <span class="token-function">transmission_coeff</span>(<span class="token-param">E</span>, <span class="token-param">V0</span>, <span class="token-param">L</span>, <span class="token-param">m</span>=<span class="token-number">9.109e-31</span>):
+    <span class="token-string">"""Exact transmission coefficient for a rectangular barrier.
+    E: particle energy (eV), V0: barrier height (eV),
+    L: barrier width (m), m: particle mass (kg)."""</span>
+    hbar = <span class="token-number">1.055e-34</span>
+    E_J = E * <span class="token-number">1.6e-19</span>
+    V_J = V0 * <span class="token-number">1.6e-19</span>
+
+    <span class="token-keyword">if</span> E >= V0:
+        k2 = np.<span class="token-function">sqrt</span>(<span class="token-number">2</span>*m*(E_J - V_J)) / hbar
+        <span class="token-keyword">return</span> <span class="token-number">1</span> / (<span class="token-number">1</span> + (V_J**<span class="token-number">2</span> * np.<span class="token-function">sin</span>(k2*L)**<span class="token-number">2</span>)
+                    / (<span class="token-number">4</span>*E_J*(E_J - V_J)))
+
+    kappa = np.<span class="token-function">sqrt</span>(<span class="token-number">2</span>*m*(V_J - E_J)) / hbar
+    <span class="token-keyword">return</span> <span class="token-number">1</span> / (<span class="token-number">1</span> + (V_J**<span class="token-number">2</span> * np.<span class="token-function">sinh</span>(kappa*L)**<span class="token-number">2</span>)
+                / (<span class="token-number">4</span>*E_J*(V_J - E_J)))
+
+<span class="token-comment"># Example: electron, 5 eV energy, 10 eV barrier, 0.1 nm wide</span>
+T = <span class="token-function">transmission_coeff</span>(E=<span class="token-number">5</span>, V0=<span class="token-number">10</span>, L=<span class="token-number">0.1e-9</span>)
+<span class="token-function">print</span>(<span class="token-string">f"Transmission probability: {T:.4%}"</span>)</code></pre>
+      </div>
+
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           15. CONCLUSION
+           ════════════════════════════════════════════════════════════════════ -->
+      <h2 id="conclusion">15. Conclusion — The Strangest, Most Successful Theory in History</h2>
+
+      <p>We've journeyed from the experiments that shattered classical physics, through the mathematical formalism of wave functions and operators, to the deepest conceptual puzzles of measurement and entanglement. The picture that emerges is extraordinary.</p>
+
+      <p>Quantum mechanics tells us that:</p>
+
+      <ul>
+        <li><strong>Reality is probabilistic:</strong> Outcomes are governed by probability amplitudes, not deterministic trajectories.</li>
+        <li><strong>Observation matters:</strong> The act of measurement fundamentally changes the system. Unobserved particles don't have definite properties.</li>
+        <li><strong>Everything is connected:</strong> Entangled particles share a quantum state that transcends space. The universe is fundamentally non-local (in a specific, non-signaling sense).</li>
+        <li><strong>There are fundamental limits:</strong> The uncertainty principle sets absolute bounds on what can be known simultaneously.</li>
+        <li><strong>The classical world is an approximation:</strong> Our everyday experience of definite objects in definite places is an emergent phenomenon arising from decoherence of underlying quantum reality.</li>
+      </ul>
+
+      <p>And yet, despite its strangeness, quantum mechanics is the most <strong>precisely tested</strong> theory in the history of science. The magnetic moment of the electron has been measured and predicted to agree to <strong>12 decimal places</strong> — the most accurate agreement between theory and experiment ever achieved in any science.</p>
+
+      <div class="callout insight">
+        <div class="callout-title">What's Next</div>
+        <p>In the next article in this series — <strong>General Relativity & Spacetime</strong> — we'll explore Einstein's other great revolution: the idea that gravity isn't a force but a curvature of spacetime. When quantum mechanics and general relativity collide, we arrive at the frontiers of modern physics: black holes, the Big Bang, and the search for quantum gravity.</p>
+      </div>
+
+      <p style="text-align: center; margin-top: 3rem;">
+        <a href="universe.html" class="btn btn-secondary">← Back to Universe Section</a>
+      </p>
+
+    </div>
+  </article>
+
+  <div class="glow-orb pink" style="width:500px;height:500px;top:15%;left:-12%;"></div>
+  <div class="glow-orb cyan" style="width:400px;height:400px;bottom:20%;right:-10%;"></div>
+
+  <footer class="footer">
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="deep-learning.html">Deep Learning</a>
+      <a href="brain.html">Brain</a>
+      <a href="universe.html">Universe</a>
+    </div>
+    <p>&copy; 2026 Deep Blog. Built with curiosity and caffeine.</p>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/quantum.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof katex !== 'undefined') {
+        setTimeout(function() {
+          document.querySelectorAll('.math-block[data-math]').forEach(function(el) {
+            katex.render(el.getAttribute('data-math'), el, { displayMode: true, throwOnError: false });
+          });
+          document.querySelectorAll('.inline-math[data-math]').forEach(function(el) {
+            katex.render(el.getAttribute('data-math'), el, { displayMode: false, throwOnError: false });
+          });
+        }, 100);
+      }
+    });
+  </script>
+</body>
+</html>
