@@ -46,9 +46,13 @@
     <div class="container">
 
       <div class="search-wrapper">
-        <span class="search-icon">🔍</span>
+        <span class="search-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
         <input type="text" class="search-bar" id="blogSearch" placeholder="Search blogs by title, topic, or tag..." autocomplete="off">
-        <button class="search-clear" id="searchClear" aria-label="Clear search">✕</button>
+        <span class="search-shortcut"><kbd>/</kbd></span>
+        <div class="search-meta">
+          <span class="search-count"></span>
+          <button class="search-clear" id="searchClear" aria-label="Clear search"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+        </div>
       </div>
 
       <div class="blog-cards-grid" id="blogGrid">
@@ -115,42 +119,5 @@
   <script src="js/main.js"></script>
   <script src="js/deep-learning-hero.js"></script>
 
-  <!-- Search functionality -->
-  <script>
-  (function() {
-    const input = document.getElementById('blogSearch');
-    const clearBtn = document.getElementById('searchClear');
-    const grid = document.getElementById('blogGrid');
-    const noResults = document.getElementById('noResults');
-    if (!input || !grid) return;
-
-    const cards = Array.from(grid.querySelectorAll('.blog-card'));
-
-    input.addEventListener('input', function() {
-      const q = this.value.toLowerCase().trim();
-      clearBtn.classList.toggle('visible', q.length > 0);
-      let visible = 0;
-
-      cards.forEach(card => {
-        const title = (card.dataset.title || '').toLowerCase();
-        const tags = (card.dataset.tags || '').toLowerCase();
-        const summary = (card.querySelector('.blog-card-summary') || {}).textContent || '';
-        const match = !q || title.includes(q) || tags.includes(q) || summary.toLowerCase().includes(q);
-
-        card.classList.toggle('filtered-out', !match);
-        card.classList.toggle('filtered-in', match);
-        if (match) visible++;
-      });
-
-      noResults.classList.toggle('visible', visible === 0 && q.length > 0);
-    });
-
-    clearBtn.addEventListener('click', function() {
-      input.value = '';
-      input.dispatchEvent(new Event('input'));
-      input.focus();
-    });
-  })();
-  </script>
 </body>
 </html>

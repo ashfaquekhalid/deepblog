@@ -190,4 +190,210 @@
     });
   });
 
+  /* ═══════════════════════════════════════════════════════════════════════
+     BLOG REGISTRY — Single source of truth for all blog posts
+     ═══════════════════════════════════════════════════════════════════════ */
+  window.BLOG_REGISTRY = [
+    { title: "Samplers for Flow Matching", section: "Deep Learning", sectionClass: "dl", icon: "🎯", tags: "samplers,ode,euler,rk4,heun,midpoint,adaptive,flow matching,generative models", url: "samplers-flow-matching.html", time: "30 min", date: "Mar 2026", summary: "A deep dive into ODE solvers for generating samples — Euler, Midpoint, Heun, RK4, adaptive methods, stochastic samplers, and distillation." },
+    { title: "Flow Matching: The Complete Guide", section: "Deep Learning", sectionClass: "dl", icon: "📐", tags: "flow matching,generative models,velocity field,optimal transport,conditional flow matching,cnf,ode,probability paths", url: "flow-matching.html", time: "35 min", date: "Mar 2026", summary: "From probability distributions to state-of-the-art generative models — everything about flow matching with interactive 3D animations." },
+    { title: "How Neurons Compute", section: "Brain", sectionClass: "brain", icon: "🧬", tags: "neuroscience,neurons,action potential,synapses,plasticity,hodgkin-huxley,computation,brain", url: "how-neurons-compute.html", time: "40 min", date: "Mar 2026", summary: "From action potentials to synaptic plasticity — the fundamental computational unit of the brain, with interactive simulations." },
+    { title: "Quantum Mechanics: The Rules of Reality", section: "Universe", sectionClass: "universe", icon: "⚛️", tags: "quantum,physics,wave-particle duality,superposition,entanglement,uncertainty,tunneling,measurement,schrodinger", url: "quantum-mechanics.html", time: "45 min", date: "Mar 2026", summary: "Wave-particle duality, superposition, entanglement, and the measurement problem — explained with interactive simulations." }
+  ];
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     SEARCH — Upgraded search bar logic (section pages + global)
+     ═══════════════════════════════════════════════════════════════════════ */
+  function initSectionSearch() {
+    const wrapper = document.querySelector(".search-wrapper");
+    const input = wrapper && wrapper.querySelector(".search-bar");
+    const grid = document.getElementById("blogGrid");
+    const noResults = document.getElementById("noResults");
+    const shortcut = wrapper && wrapper.querySelector(".search-shortcut");
+    const meta = wrapper && wrapper.querySelector(".search-meta");
+    const countEl = wrapper && wrapper.querySelector(".search-count");
+    const clearBtn = wrapper && wrapper.querySelector(".search-clear");
+    if (!input || !grid) return;
+
+    const cards = Array.from(grid.querySelectorAll(".blog-card"));
+    const totalCards = cards.filter(c => !c.classList.contains("coming-soon-card")).length;
+
+    input.addEventListener("focus", () => wrapper.classList.add("focused"));
+    input.addEventListener("blur", () => { if (!input.value) wrapper.classList.remove("focused"); });
+
+    input.addEventListener("input", function () {
+      const q = this.value.toLowerCase().trim();
+      if (shortcut) shortcut.classList.toggle("hidden", q.length > 0);
+      if (meta) meta.classList.toggle("visible", q.length > 0);
+      let visible = 0;
+
+      cards.forEach(card => {
+        const title = (card.dataset.title || "").toLowerCase();
+        const tags = (card.dataset.tags || "").toLowerCase();
+        const summary = (card.querySelector(".blog-card-summary") || {}).textContent || "";
+        const match = !q || title.includes(q) || tags.includes(q) || summary.toLowerCase().includes(q);
+        card.classList.toggle("filtered-out", !match);
+        card.classList.toggle("filtered-in", match);
+        if (match) visible++;
+      });
+
+      if (countEl) countEl.textContent = visible + " of " + totalCards;
+      if (noResults) noResults.classList.toggle("visible", visible === 0 && q.length > 0);
+    });
+
+    if (clearBtn) {
+      clearBtn.addEventListener("click", function () {
+        input.value = "";
+        input.dispatchEvent(new Event("input"));
+        input.focus();
+      });
+    }
+  }
+
+  function initGlobalSearch() {
+    const wrapper = document.querySelector(".global-search-wrapper");
+    if (!wrapper) return;
+    const input = wrapper.querySelector(".search-bar");
+    const dropdown = wrapper.querySelector(".search-dropdown");
+    const shortcut = wrapper.querySelector(".search-shortcut");
+    const meta = wrapper.querySelector(".search-meta");
+    const countEl = wrapper.querySelector(".search-count");
+    const clearBtn = wrapper.querySelector(".search-clear");
+    if (!input || !dropdown) return;
+
+    let activeIndex = -1;
+
+    input.addEventListener("focus", () => wrapper.classList.add("focused"));
+    input.addEventListener("blur", () => {
+      setTimeout(() => {
+        wrapper.classList.remove("focused");
+        dropdown.classList.remove("open");
+      }, 200);
+    });
+
+    function renderResults(q) {
+      const blogs = window.BLOG_REGISTRY || [];
+      const query = q.toLowerCase().trim();
+      let matches = blogs;
+      if (query) {
+        matches = blogs.filter(b =>
+          b.title.toLowerCase().includes(query) ||
+          b.tags.toLowerCase().includes(query) ||
+          b.summary.toLowerCase().includes(query) ||
+          b.section.toLowerCase().includes(query)
+        );
+      }
+
+      if (shortcut) shortcut.classList.toggle("hidden", query.length > 0);
+      if (meta) meta.classList.toggle("visible", query.length > 0);
+      if (countEl) countEl.textContent = matches.length + " result" + (matches.length !== 1 ? "s" : "");
+
+      if (!query) { dropdown.classList.remove("open"); activeIndex = -1; return; }
+
+      activeIndex = -1;
+      let html = "";
+
+      if (matches.length === 0) {
+        html = '<div class="search-dropdown-empty">No blogs match your search.</div>';
+      } else {
+        const grouped = {};
+        matches.forEach(b => {
+          if (!grouped[b.section]) grouped[b.section] = [];
+          grouped[b.section].push(b);
+        });
+        for (const section in grouped) {
+          html += '<div class="search-dropdown-section">' + section + "</div>";
+          grouped[section].forEach(b => {
+            html += '<a href="' + b.url + '" class="search-result" data-url="' + b.url + '">' +
+              '<div class="search-result-icon">' + b.icon + "</div>" +
+              '<div class="search-result-body">' +
+                '<div class="search-result-title">' + b.title + "</div>" +
+                '<div class="search-result-summary">' + b.summary + "</div>" +
+                '<div class="search-result-meta">' +
+                  '<span class="search-section-pill ' + b.sectionClass + '">' + b.section + "</span>" +
+                  '<span class="search-result-time">' + b.time + " read</span>" +
+                "</div>" +
+              "</div>" +
+            "</a>";
+          });
+        }
+      }
+
+      html += '<div class="search-dropdown-hint"><kbd>↑</kbd><kbd>↓</kbd> navigate  <kbd>↵</kbd> open  <kbd>esc</kbd> close</div>';
+      dropdown.innerHTML = html;
+      dropdown.classList.add("open");
+    }
+
+    input.addEventListener("input", function () {
+      renderResults(this.value);
+    });
+
+    input.addEventListener("keydown", function (e) {
+      if (!dropdown.classList.contains("open")) return;
+      const items = dropdown.querySelectorAll(".search-result");
+      if (!items.length) return;
+
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        activeIndex = Math.min(activeIndex + 1, items.length - 1);
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        activeIndex = Math.max(activeIndex - 1, 0);
+      } else if (e.key === "Enter" && activeIndex >= 0) {
+        e.preventDefault();
+        const url = items[activeIndex].getAttribute("data-url") || items[activeIndex].getAttribute("href");
+        if (url) window.location.href = url;
+        return;
+      } else if (e.key === "Escape") {
+        e.preventDefault();
+        dropdown.classList.remove("open");
+        input.blur();
+        return;
+      } else {
+        return;
+      }
+
+      items.forEach(it => it.classList.remove("active"));
+      if (items[activeIndex]) {
+        items[activeIndex].classList.add("active");
+        items[activeIndex].scrollIntoView({ block: "nearest" });
+      }
+    });
+
+    if (clearBtn) {
+      clearBtn.addEventListener("click", function () {
+        input.value = "";
+        dropdown.classList.remove("open");
+        if (shortcut) shortcut.classList.remove("hidden");
+        if (meta) meta.classList.remove("visible");
+        input.focus();
+      });
+    }
+  }
+
+  /* ── Keyboard shortcuts: Ctrl+K or / to focus search ─────────────────── */
+  document.addEventListener("keydown", function (e) {
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA" || e.target.isContentEditable) {
+      if (e.key === "Escape") {
+        e.target.blur();
+        const dd = document.querySelector(".search-dropdown.open");
+        if (dd) dd.classList.remove("open");
+      }
+      return;
+    }
+    if ((e.key === "/" || (e.key === "k" && (e.metaKey || e.ctrlKey)))) {
+      e.preventDefault();
+      const searchInput = document.querySelector(".global-search-wrapper .search-bar") ||
+                          document.querySelector(".search-wrapper .search-bar");
+      if (searchInput) {
+        searchInput.focus();
+        searchInput.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }
+  });
+
+  document.addEventListener("DOMContentLoaded", function () {
+    initSectionSearch();
+    initGlobalSearch();
+  });
+
 })();

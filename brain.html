@@ -41,11 +41,21 @@
     <div class="hero-overlay"></div>
   </section>
 
-  <!-- Coming Soon Blog Cards -->
+  <!-- Blog Cards -->
   <section class="landing-body">
     <div class="container">
 
-      <div class="blog-cards-grid">
+      <div class="search-wrapper">
+        <span class="search-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+        <input type="text" class="search-bar" id="blogSearch" placeholder="Search Brain blogs..." autocomplete="off">
+        <span class="search-shortcut"><kbd>/</kbd></span>
+        <div class="search-meta">
+          <span class="search-count"></span>
+          <button class="search-clear" id="searchClear" aria-label="Clear search"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+        </div>
+      </div>
+
+      <div class="blog-cards-grid" id="blogGrid">
 
         <a href="how-neurons-compute.html" class="blog-card reveal" data-title="How Neurons Compute" data-tags="neuroscience,neurons,action potential,synapses,plasticity,hodgkin-huxley,computation,brain">
           <div class="blog-card-body">
@@ -130,6 +140,8 @@
         </div>
 
       </div>
+
+      <p class="no-results" id="noResults">No blogs match your search.</p>
 
     </div>
   </section>
