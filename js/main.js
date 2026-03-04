@@ -379,9 +379,65 @@
     }
   });
 
+  /* ═══════════════════════════════════════════════════════════════════════
+     ASK FORM — Submit questions to Google Apps Script
+     ═══════════════════════════════════════════════════════════════════════ */
+  var ASK_ENDPOINT = "https://script.google.com/macros/s/AKfycbwRHRdEJfSYezvHIURu9YJOhRe4g3gVqwiUIVYwKQNlb-FD7scJiHaXO093YcKnpJs8YA/exec";
+
+  function initAskForm() {
+    var form = document.getElementById("askForm");
+    if (!form) return;
+    var btn = form.querySelector(".ask-btn");
+    var successEl = document.getElementById("askSuccess");
+    var errorEl = document.getElementById("askError");
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var name = form.elements.name.value.trim();
+      var question = form.elements.question.value.trim();
+      if (!question) return;
+
+      btn.disabled = true;
+      btn.classList.add("loading");
+      successEl.classList.remove("visible");
+      errorEl.classList.remove("visible");
+
+      var payload = {
+        name: name || "Anonymous",
+        question: question,
+        page: window.location.pathname.split("/").pop() || "index.html"
+      };
+
+      var formData = new FormData();
+      formData.append("name", payload.name);
+      formData.append("question", payload.question);
+      formData.append("page", payload.page);
+
+      fetch(ASK_ENDPOINT, {
+        method: "POST",
+        body: formData
+      })
+      .then(function () {
+        successEl.classList.add("visible");
+        form.reset();
+        setTimeout(function () { successEl.classList.remove("visible"); }, 4000);
+      })
+      .catch(function () {
+        successEl.classList.add("visible");
+        form.reset();
+        setTimeout(function () { successEl.classList.remove("visible"); }, 4000);
+      })
+      .finally(function () {
+        btn.disabled = false;
+        btn.classList.remove("loading");
+      });
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     initSectionSearch();
     initGlobalSearch();
+    initAskForm();
   });
 
 })();

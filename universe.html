@@ -175,6 +175,21 @@
   <div class="glow-orb pink" style="width:500px;height:500px;top:20%;left:-10%;"></div>
   <div class="glow-orb cyan" style="width:400px;height:400px;bottom:15%;right:-8%;"></div>
 
+  <!-- Ask a Question -->
+  <section class="ask-section">
+    <div class="ask-card">
+      <h3>Got a <span class="gradient-text">Question?</span></h3>
+      <p>Ask anything about the topics covered here.</p>
+      <form class="ask-form" id="askForm">
+        <input type="text" class="ask-input" name="name" placeholder="Your name (optional)" autocomplete="off">
+        <textarea class="ask-textarea" name="question" placeholder="Type your question..." required></textarea>
+        <button type="submit" class="btn btn-primary ask-btn">Send Question</button>
+      </form>
+      <div class="ask-success" id="askSuccess">Thanks! We'll look into it.</div>
+      <div class="ask-error" id="askError">Something went wrong. Try again.</div>
+    </div>
+  </section>
+
   <footer class="footer">
     <div class="footer-links">
       <a href="index.html">Home</a>
